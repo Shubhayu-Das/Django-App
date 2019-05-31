@@ -1,0 +1,12 @@
+{% extends "Registry/studentBase.html" %}
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href = {% static "css/studentMessage.css" %}>
+{% endblock %}
+
+{% block body %}
+    {% for post in posts %}
+        <p>{{ post }}</p>
+    {% endfor %}
+{% endblock %}

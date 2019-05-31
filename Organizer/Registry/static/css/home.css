@@ -1,0 +1,27 @@
+html, body{
+    width: 100%;
+}
+
+.d-flex{
+    position: absolute;
+    left: 45%;
+    top: 45%;
+}
+
+.mt3{
+    text-decoration: none;
+}
+
+.mt3 a{
+    color: white;
+    font-size: calc(2vw);
+}
+
+.container-fluid{
+    padding: 0%;
+}
+#wallpaper{
+    padding: 0%;
+    background-size: auto;
+    background-repeat: no-repeat;
+}

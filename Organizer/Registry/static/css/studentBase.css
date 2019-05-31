@@ -1,0 +1,53 @@
+html, body{
+    width: 100%;
+}
+
+.container-fluid{
+    padding-left: 0%;
+    padding-right: 0%; 
+    margin-right: 0%;
+}
+
+.navbar-brand{
+    font-size: calc(5vh);
+}
+
+.footer{
+    z-index: 10;
+    margin-top: 4%;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
+
+.nav-link{
+    font-size: calc(3vh);
+}
+
+#contactLinks{
+    color:white;
+    font-size: 30px;
+}
+
+#contributors{
+    color:white;
+    word-wrap: break-word;
+    font-size: calc(1.5vh);
+}
+
+@media (min-width: 768px){
+    #title{
+        padding-left: calc(4vw);
+        padding-right: calc(2vw);
+    }
+
+    #logout{
+        position: fixed;
+        left: 90%;
+    }
+
+    #body{
+        height: calc(76vh);
+    }
+    
+}
