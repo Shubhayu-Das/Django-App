@@ -12,6 +12,7 @@ class storeData(models.Model):
     password = models.CharField(max_length = 30, verbose_name = "Password")
     
     no_of_class_attended = models.IntegerField(default = 0)
+    last_class_attended = models.DateTimeField(auto_now = True)
     
     fee_status = models.BooleanField(default = False)
     validated = models.BooleanField(default = False)

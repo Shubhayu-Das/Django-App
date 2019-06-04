@@ -1,15 +1,14 @@
 from django.shortcuts import render, HttpResponse, redirect
-from django.contrib.auth.models import User
-from .forms import LoginForm, SelectStudentForm, RegistrationForm
-from datetime import date
+from .forms import LoginForm, SelectStudentForm, RegistrationForm, AttendanceForm
+from datetime import datetime
 from .models import Message, storeData
 
 def authenticate(username = None, password = None):
-    '''
+    
     user = storeData.objects.get(username = username)
-    print(user['password'])
+    
     if password == user.password:
-        user['is_logged_in'] = True
+        user.is_logged_in = True
         user.save()
     else:
         return None
@@ -18,12 +17,14 @@ def authenticate(username = None, password = None):
         return "Yes"
     else:
         return "No"
-    '''
-    return "Yes"
+
+    return "None"
 
 def userlogout(username):
     user = storeData.objects.get(username = username)
     user.is_logged_in = False
+    user.save()
+    
     return True
 
 
@@ -81,12 +82,49 @@ def fees(request):
 
 # Show basic data like the email id and the phone number details.
 def studentsData(request):
-    return render(request, 'Registry/studentsData.html')
+
+    args = {'users':[]}
+    for user in storeData.objects.values():
+        if not user['is_superuser']:
+            temp = {'id': None, 'name': '', 'phoneNumber': '', 'classesAttended': None, 'lastAttended': None, 'feesStatus': False, 'isValidated': False}
+            temp['id'] = (user['id'])
+            temp['name'] = (user['username'])
+            temp['phoneNumber'] = (user['phone_number'])
+            temp['classesAttended'] = (user['no_of_class_attended'])
+            temp['lastAttended'] = (user['last_class_attended'].date())
+            temp['feesStatus'] = (user['fee_status'])
+            temp['isValidated'] = (user['validated'])
+
+            args['users'].append(temp)
+    return render(request, 'Registry/studentsData.html', args)
 
 # Mark and store the attendance functionalities
 def attendance(request):
-    if request.user.is_logged_in:
-        return render(request, 'Registry/attendance.html')
+
+    args = {}
+
+    if request.method == 'POST':
+        present = []
+        form = AttendanceForm(request.POST)
+
+        if form.is_valid:
+            for user in storeData.objects.values():
+                if request.POST.get(str(user['id'])):
+                    present.append(user['id'])
+
+            markPresent(present)
+            return redirect('studentsData')
+
+    else:
+        LIST_OF_CHOICES = []
+        form = AttendanceForm()
+        for user in storeData.objects.values():
+            if not user['is_superuser']:
+                LIST_OF_CHOICES.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastAttended': user['last_class_attended'].date()})
+
+        args = {'form': form ,'students': LIST_OF_CHOICES}
+
+    return render(request, 'Registry/attendance.html', args)
 
 # View for message broadcasting
 def adminMessage(request):
@@ -119,6 +157,13 @@ def adminMessage(request):
 
     return render(request, 'Registry/adminMessage.html', args)
 
+def markPresent(present):
+    for id in present:
+        person = storeData.objects.get(id = id)
+        person.last_class_attended = datetime.now()
+        person.no_of_class_attended += 1
+        person.save()
+
 def sendMessage(message, recipients):
     receivers = []
     for user in recipients:
@@ -133,7 +178,6 @@ def loginStudentHome(request):
 
 def studentMessage(request):
     toView = {'posts': [], 'dates': []}
-    print(request.user)
     for message in Message.objects.values():
         if str(request.user) in eval(message['allowedUsers']):
             print("Yes")

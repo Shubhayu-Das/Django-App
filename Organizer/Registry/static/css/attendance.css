@@ -1,0 +1,18 @@
+form{
+    position: relative;
+    padding-top: calc(5vh);
+}
+
+.table{
+    position: relative;
+    top: calc(5vh);
+    width: min-content;
+    height: max-content;
+    margin: auto;
+}
+
+@media (min-width: 768px){
+    br{
+        display: none;
+    }
+}
