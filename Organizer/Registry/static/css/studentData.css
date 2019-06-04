@@ -1,0 +1,30 @@
+#full{
+    position: relative;
+    padding-top: 5%;
+    width: max-content;
+}
+
+.table{
+    overflow-x: auto;
+}
+
+.table th{
+    text-align: center;
+}
+
+@media (min-width: 768px){
+    #full{
+        margin: auto;
+    }
+}
+
+@media (max-width: 768px){
+    #full{
+        overflow-x: hidden;
+        margin: auto;
+    }
+    .table{
+        max-width: calc(95vw);
+        margin: auto;
+    }
+}

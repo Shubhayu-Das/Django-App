@@ -18,3 +18,6 @@ class RegistrationForm(forms.ModelForm):
     class Meta:
         model = storeData
         fields = ('username', 'phone_number', 'password',)
+
+class AttendanceForm(forms.Form):
+    choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)

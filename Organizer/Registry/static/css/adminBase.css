@@ -20,12 +20,14 @@ html, body{
     padding: 0%;
     border: 0ch;
     margin: 0%;
+    max-width: 100%;
+    min-height: calc(80vh);
+    overflow: hidden;
 }
 
 .footer{
-    z-index: 10;
     margin-top: 4%;
-    position: fixed;
+    position: relative;
     bottom: 0;
     width: 100%;
 }
@@ -42,6 +44,7 @@ html, body{
 }
 
 #body{
+    position: relative;
     padding-bottom: 50%;
 }
 
