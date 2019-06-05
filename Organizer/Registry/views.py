@@ -1,16 +1,30 @@
-from django.shortcuts import render, HttpResponse, redirect
+from django.shortcuts import render, HttpResponseRedirect, redirect
 from .forms import LoginForm, SelectStudentForm, RegistrationForm, AttendanceForm
 from datetime import datetime
 from .models import Message, storeData
+from django.contrib import messages
+import uuid
 
-def authenticate(username = None, password = None):
+
+def systemCheck():
+    addr = uuid.getnode()
+    user = user = storeData.objects.get(mac_address = addr)
+    if user.is_logged_in == True:
+        return 1
+    else:
+        return 0
+
+
+
+def authenticate(request, username = None, password = None):
     
     user = storeData.objects.get(username = username)
     
-    if password == user.password:
+    if password == user.password and user.validated == True:
         user.is_logged_in = True
         user.save()
     else:
+        messages.info(request, 'Looks like the admin has not authorised your account. Please try later')
         return None
     
     if user.is_superuser == True:
@@ -41,7 +55,7 @@ def login(request):
             username = request.POST.get('username')
             password = request.POST.get('password')
 
-            response = authenticate(username=username, password=password)
+            response = authenticate(request, username=username, password=password)
             print(response)
             if response == 'Yes':         
                 return redirect('/admin-home/')
@@ -63,9 +77,15 @@ def register(request):
             username = request.POST.get('username')
             password = request.POST.get('password')
             phone = request.POST.get('phone_number')
-            storeData.objects.create(username = username, password = password, phone_number = phone)
-            
-            return redirect('/login/')
+            addr = uuid.getnode()
+            user = storeData.objects.get(mac_address = addr)
+            if user == None:
+                storeData.objects.create(username = username, password = password, phone_number = phone, mac_address = uuid.getnode())
+                messages.info(request, 'Your registration is complete. Please wait for the administrator to validate your account')
+                return HttpResponseRedirect('/home/')
+            else:
+                messages.info(request, 'Looks like you have already registered with this device')
+                return HttpResponseRedirect('/home/')
     else:
         form = RegistrationForm()
     args = {'form': form}
@@ -174,8 +194,10 @@ def sendMessage(message, recipients):
 
 #The home page for the students, where they can access the files uploaded
 def loginStudentHome(request):
-    return render(request, 'Registry/studentBase.html')
-
+    if (systemCheck()):
+        return render(request, 'Registry/studentBase.html')
+    messages.info(request, "Please login before trying to access user information")
+    return HttpResponseRedirect('/home/')
 def studentMessage(request):
     toView = {'posts': [], 'dates': []}
     for message in Message.objects.values():
@@ -190,3 +212,4 @@ def studentMessage(request):
 def logout(request):
     #userlogout(request.user)
     return redirect('home')
+    

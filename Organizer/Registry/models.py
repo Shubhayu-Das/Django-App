@@ -19,6 +19,7 @@ class storeData(models.Model):
     
     is_superuser = models.BooleanField(default = False)
     is_logged_in = models.BooleanField(default = False, verbose_name = "Logged in status")
+    mac_address = models.BigIntegerField(default = 0)
     '''
     def is_logged_in(self):
         return self.is_logged_in
