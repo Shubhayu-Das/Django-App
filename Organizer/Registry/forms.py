@@ -1,5 +1,5 @@
 from django import forms
-from .models import storeData
+from .models import storeData, FileUpload
 
 class LoginForm(forms.Form):
     model = storeData
@@ -21,3 +21,8 @@ class RegistrationForm(forms.ModelForm):
 
 class AttendanceForm(forms.Form):
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
+
+class FileUploadForm(forms.ModelForm):
+    class Meta:
+        model = FileUpload
+        fields = ('description', 'files',)

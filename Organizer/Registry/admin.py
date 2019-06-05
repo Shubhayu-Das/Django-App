@@ -1,7 +1,13 @@
 from django.contrib import admin
-from .models import Message, storeData
+from .models import Message, storeData, FileUpload
 
 #admin.site.register(Message)
+@admin.register(FileUpload)
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('description', 'files', 'upload_time')
+    ordering = ('upload_time', )
+    search_fields = ('description', 'upload_time')
+
 @admin.register(Message)
 class PostAdmin(admin.ModelAdmin):
     list_display = ('message', 'datePosted', 'allowedUsers')

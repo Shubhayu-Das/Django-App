@@ -1,0 +1,18 @@
+{% extends "Registry/adminBase.html" %}
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href = {% static "css/uploadFile.css" %}>
+{% endblock %}
+
+{% block body %}
+    <div id = "upload">
+    <form method="POST" enctype="multipart/form-data" class = "md-form">
+        {% csrf_token %}
+        <div id = "aligners"><label id = "file-message"> File description: </label></div>
+        <textarea rows = '6' class="form-control text-wrap" type="text" name = "description" placeholder="File description / details" id = "file-desc"></textarea>
+        <div id = "aligners"><input type = "file" value="Choose File" name = "files" class = "btn login-btn btn-primary" id = "file-chooser"/></div>
+        <div id = "aligners"><input type = "submit" value = "Upload" class = "btn login-btn btn-primary" id = "file-submit"/></div>
+    </form>
+</div>
+{% endblock %}

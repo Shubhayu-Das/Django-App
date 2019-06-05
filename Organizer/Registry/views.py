@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponseRedirect, redirect
-from .forms import LoginForm, SelectStudentForm, RegistrationForm, AttendanceForm
+from .forms import LoginForm, SelectStudentForm, RegistrationForm, AttendanceForm, FileUploadForm
 from datetime import datetime
 from .models import Message, storeData
 from django.contrib import messages
@@ -16,7 +16,7 @@ def systemCheck():
 
 
 
-def authenticate(request, username = None, password = None):
+def authenticate(username = None, password = None):
     
     user = storeData.objects.get(username = username)
     
@@ -25,7 +25,7 @@ def authenticate(request, username = None, password = None):
         user.save()
     else:
         messages.info(request, 'Looks like the admin has not authorised your account. Please try later')
-        return None
+        return "None"
     
     if user.is_superuser == True:
         return "Yes"
@@ -55,7 +55,7 @@ def login(request):
             username = request.POST.get('username')
             password = request.POST.get('password')
 
-            response = authenticate(request, username=username, password=password)
+            response = authenticate(username=username, password=password)
             print(response)
             if response == 'Yes':         
                 return redirect('/admin-home/')
@@ -78,13 +78,13 @@ def register(request):
             password = request.POST.get('password')
             phone = request.POST.get('phone_number')
             addr = uuid.getnode()
-            user = storeData.objects.get(mac_address = addr)
-            if user == None:
+            try:
+                user = storeData.objects.get(mac_address = addr)
+                messages.info(request, 'Looks like you have already registered with this device')
+                return HttpResponseRedirect('/home/')
+            except:
                 storeData.objects.create(username = username, password = password, phone_number = phone, mac_address = uuid.getnode())
                 messages.info(request, 'Your registration is complete. Please wait for the administrator to validate your account')
-                return HttpResponseRedirect('/home/')
-            else:
-                messages.info(request, 'Looks like you have already registered with this device')
                 return HttpResponseRedirect('/home/')
     else:
         form = RegistrationForm()
@@ -177,6 +177,17 @@ def adminMessage(request):
 
     return render(request, 'Registry/adminMessage.html', args)
 
+def uploadFile(request):
+    if request.method == 'POST':
+        form = FileUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('adminhome')
+    else:
+        form = FileUploadForm()
+
+    return render(request, 'Registry/uploadFile.html', {'form': form})
+
 def markPresent(present):
     for id in present:
         person = storeData.objects.get(id = id)
@@ -198,6 +209,7 @@ def loginStudentHome(request):
         return render(request, 'Registry/studentBase.html')
     messages.info(request, "Please login before trying to access user information")
     return HttpResponseRedirect('/home/')
+
 def studentMessage(request):
     toView = {'posts': [], 'dates': []}
     for message in Message.objects.values():

@@ -11,6 +11,7 @@ urlpatterns = [
         path('admin-home/student-data/', views.studentsData, name = 'studentsData'),
         path('student-home/student-message/', views.studentMessage, name = 'studentMessage'),
         path('admin-home/admin-message/', views.adminMessage, name = 'adminMessage'),
+        path('admin-home/admin-upload-files/', views.uploadFile, name = 'uploadFile'),
         path('admin-home/fees/', views.fees, name = 'fees'),
         path('signup/', views.register, name='signup'),
 ]

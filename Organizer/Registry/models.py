@@ -39,3 +39,8 @@ class Message(models.Model):
         
     class Meta:
         ordering = ('-datePosted', )
+
+class FileUpload(models.Model):
+    description = models.CharField(blank = True, max_length = 1000)
+    files = models.FileField(upload_to = 'files/%Y/')
+    upload_time = models.DateTimeField(auto_now_add = True)
