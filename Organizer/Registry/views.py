@@ -153,7 +153,7 @@ def attendance(request):
     return render(request, 'Registry/attendance.html', args)
 
 # View for message broadcasting
-def adminMessage(request):
+def admin_Send_Message(request):
 
     args = {}
     if request.method == 'POST':
@@ -169,6 +169,7 @@ def adminMessage(request):
                         recipients.append(user)
 
             sendMessage(message, recipients)
+            messages.info(request, 'Message has been sent.')
             return redirect('adminhome')
         
     else:
@@ -182,7 +183,25 @@ def adminMessage(request):
         args = {"form": form, "students": LIST_OF_CHOICES}
 
     return render(request, 'Registry/adminMessage.html', args)
+def student_Send_Message(request):
+    args = {}
+    if request.method == 'POST':
+        form = SelectStudentForm(request.POST)
+        if form.is_valid:
+            message = request.POST['message']
 
+            for user in storeData.objects.values():
+                if user['is_superuser'] == True:
+                    admin = user
+            l = []
+            l.append(admin)
+            print("Sent message")
+            sendMessage(message, l)
+            return redirect('/student-home')
+    else:
+            form = SelectStudentForm()
+            args = {"form": form}
+    return render(request, 'Registry/student_Send_Message.html', args)
 def uploadFile(request):
     if request.method == 'POST':
         form = FileUploadForm(request.POST, request.FILES)
@@ -205,11 +224,12 @@ def sendMessage(message, recipients):
     receivers = []
     for user in recipients:
         receivers.append(user['username'])
-    message = Message(message = message, allowedUsers = repr(receivers))
+    sender = storeData.objects.get(mac_address = uuid.getnode())
+    message = Message(message = message, allowedUsers = repr(receivers), sender = sender.username)
     message.save()
     
 
-#The home page for the students, where they can access the files uploaded
+#The home page for the students.
 def loginStudentHome(request):
     if (systemCheck()):
         user_id = request.session.get('user_info')
@@ -224,15 +244,32 @@ def loginStudentHome(request):
     messages.info(request, "Please login before trying to access user information")
     return HttpResponseRedirect('/home/')
 
-def studentMessage(request):
-    toView = {'posts': [], 'dates': []}
+def admin_View_Message(request):
+    final = {'message': []}
+    addr = uuid.getnode()
+    user = storeData.objects.get(is_superuser = 1)
     for message in Message.objects.values():
-        if str(request.user) in eval(message['allowedUsers']):
+        #print(message['allowedUsers'])
+        print(message)
+        if str(user.username) in (message['allowedUsers']):
+            print(message['allowedUsers'])
+            print(user.username)
             print("Yes")
-            toView['posts'].append(message['message'])
-            toView['dates'].append(str(message['datePosted']))
+            print(message['message'])
+            final['message'].append({'posts': (message['message']), 'dates': (str(message['datePosted'])), 'sender': (str(message['sender']))})
+    print(final)
+    return render(request, 'Registry/admin_View_Message.html', final)
 
-    return render(request, 'Registry/studentMessage.html', toView)
+def student_View_Message(request):
+    final = {'message': []}
+    addr = uuid.getnode()
+    user = storeData.objects.get(mac_address = addr)
+    for message in Message.objects.values():
+        print(message['allowedUsers'])
+        if str(user.username) in (message['allowedUsers']):
+            final['message'].append({'posts': (message['message']), 'dates': (str(message['datePosted'])), 'sender': (str(message['sender']))})
+    return render(request, 'Registry/student_View_Message.html', final)
+
 
 # logout functionality
 def logout(request):

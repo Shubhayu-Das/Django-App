@@ -41,7 +41,7 @@
                         <a href = "{% url 'fees' %}" class = "nav-link">Fees</a>
                     </li>
                     <li class = "navbar-nav mr-auto">
-                        <a href = "{% url 'adminMessage' %}" class = "nav-link">Messages</a>
+                        <a href = "{% url 'admin_View_Message' %}" class = "nav-link">Messages</a>
                     </li>
                     <li class = "navbar-nav mr-auto">
                         <a href = "{% url 'uploadFile' %}" class = "nav-link">Material</a>
@@ -55,6 +55,13 @@
     
     <div id = "body">
         {% block body %}
+        {% if messages %}
+    <ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
         {% endblock %}
     </div>
 

@@ -33,7 +33,7 @@ class Message(models.Model):
     message = models.CharField(max_length = 3000, verbose_name = "Message: ")
     datePosted = models.DateTimeField(auto_now_add = True, verbose_name = "Date Posted: ")
     allowedUsers = models.CharField(max_length = 1000, verbose_name = 'Allowed Users: ')
-
+    sender = models.CharField(max_length = 100, verbose_name = 'Sender: ', default = 'admin')
     def __str__(self):
         return self.message[:15]+'...'
         

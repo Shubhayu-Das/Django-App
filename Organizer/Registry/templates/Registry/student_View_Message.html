@@ -6,8 +6,8 @@
 {% endblock %}
 
 {% block body %}
-<h1>Hello all</h1>
-    {% for post in posts %}
-        <p>{{ post }}</p>
-    {% endfor %}
+<a href="{% url 'student_Send_Message' %}">Send message to admin</a>
+        {% for mess in message %}
+        <p>{{ mess.posts }} {{ mess.dates}} {{ mess.sender }} </p>
+        {% endfor %}
 {% endblock %}

@@ -1,0 +1,15 @@
+{% extends "Registry/adminBase.html" %}
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href = {% static "css/adminMessage.css" %}>
+{% endblock %}
+
+{% block body %}
+    <div id = 'allMessage'>
+        {% for mess in message %}
+        <p>{{ mess.posts }} {{ mess.dates}} {{ mess.sender }} </p>
+        {% endfor %}
+        <a href="{% url 'admin_Send_Message' %}">Send message</a>
+</div>
+{% endblock %}
