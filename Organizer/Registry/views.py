@@ -197,6 +197,7 @@ def student_Send_Message(request):
             l.append(admin)
             print("Sent message")
             sendMessage(message, l)
+            messages.info(request, 'Message has been sent.')
             return redirect('/student-home')
     else:
             form = SelectStudentForm()
