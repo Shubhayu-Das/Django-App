@@ -16,7 +16,7 @@ def systemCheck():
 
 
 
-def authenticate(username = None, password = None):
+def authenticate(request, username = None, password = None):
     
     user = storeData.objects.get(username = username)
     
@@ -24,7 +24,10 @@ def authenticate(username = None, password = None):
         user.is_logged_in = True
         user.save()
     else:
-        messages.info(request, 'Looks like the admin has not authorised your account. Please try later')
+        if password != user.password:
+            messages.info(request, 'Please enter the correct password')
+        else:
+            messages.info(request, 'Looks like the admin has not authorised your account. Please try later')
         return "None"
     
     if user.is_superuser == True:
@@ -55,11 +58,14 @@ def login(request):
             username = request.POST.get('username')
             password = request.POST.get('password')
 
-            response = authenticate(username=username, password=password)
+            response = authenticate(request, username=username, password=password)
             print(response)
             if response == 'Yes':         
                 return redirect('/admin-home/')
             elif response == "No":
+                user = storeData.objects.get(username = username)
+                messages.info(request, str(user.id))
+                request.session['user_info'] = user.id
                 return redirect('/student-home/')
             else:
                 return redirect('/home/')
@@ -100,7 +106,7 @@ def loginAdminHome(request):
 def fees(request):
     return render(request, 'Registry/fees.html')
 
-# Show basic data like the email id and the phone number details.
+# Show basic data like the email id and the phone number details(Admin page)
 def studentsData(request):
 
     args = {'users':[]}
@@ -118,7 +124,7 @@ def studentsData(request):
             args['users'].append(temp)
     return render(request, 'Registry/studentsData.html', args)
 
-# Mark and store the attendance functionalities
+# Mark and store the attendance functionalities(Admin page)
 def attendance(request):
 
     args = {}
@@ -206,7 +212,15 @@ def sendMessage(message, recipients):
 #The home page for the students, where they can access the files uploaded
 def loginStudentHome(request):
     if (systemCheck()):
-        return render(request, 'Registry/studentBase.html')
+        user_id = request.session.get('user_info')
+        user = storeData.objects.get(id = user_id)
+        user_data = {'id': None, 'name': '', 'classesAttended': None, 'lastAttended': None, 'feesStatus': False}
+        user_data['id'] = user.id
+        user_data['name'] = user.username
+        user_data['classesAttended'] = user.no_of_class_attended
+        user_data['lastAttended'] = user.last_class_attended.date()
+        user_data['feesStatus'] = user.fee_status
+        return render(request, 'Registry/studentBase.html', user_data)
     messages.info(request, "Please login before trying to access user information")
     return HttpResponseRedirect('/home/')
 
