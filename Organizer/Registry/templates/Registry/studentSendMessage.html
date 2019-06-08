@@ -1,0 +1,24 @@
+{% extends "Registry/studentBase.html" %}
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href = {% static "css/studentSendMessage.css" %}>
+{% endblock %}
+
+{% block body %}
+    <div id = 'allMessage'>
+        <a href="{% url 'studentViewMessage' %}" id = "back">Back</a>
+        <form method="POST" id = "form">
+            {% csrf_token %}
+            <div class = "form-group" id = "messageBox">
+                <label id = "tag"> Message: </label>
+                <textarea rows = '6' class="form-control text-wrap" type="text" name = "message" placeholder="Message here" id = "getMessage"></textarea>
+
+                <div id = "post"><input type="submit" value="Post" class="btn login-btn btn-warning float-right"></div>
+            </div>
+        </form>
+    {% if message %}
+    {{ message }}
+    {% endif %}
+</div>
+{% endblock %}

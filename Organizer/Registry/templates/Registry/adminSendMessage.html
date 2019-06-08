@@ -1,0 +1,51 @@
+{% extends "Registry/adminBase.html" %}
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href = {% static "css/adminSendMessage.css" %}>
+{% endblock %}
+
+{% block body %}
+    <div id = 'allMessage'>
+        <a href="{% url 'adminViewMessage' %}"><- back</a>
+    
+        <form method="POST" id = "form">
+            {% csrf_token %}
+            <div class = "form-group" id = "messageBox">
+                <label id = "tag"> Message: </label>
+                <textarea rows = '6' class="form-control text-wrap" type="text" name = "message" placeholder="Message here" id = "desc"></textarea>
+                <div id = "selectTable">
+                    <table class = "table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th style = "font-size: calc(2.5vh)">Select all</th>
+                                <th><input type="checkbox" class = "check" name = "selectall"></th>
+                            </tr>
+                            <tr>
+                                    <th style = "font-size: calc(2.5vh)">Batch 1</th>
+                                    <th><input type="checkbox" class = "check" name = "batch1"></th>
+                            </tr>
+                            <tr>
+                                    <th style = "font-size: calc(2.5vh)">Batch 2</th>
+                                    <th><input type="checkbox" class = "check" name = "batch2"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for student in students %}
+                            <tr>    
+                                <td class = "labels">{{ student.username }}</td>
+                                <td><input type="checkbox" class = "check" name = "{{student.id}}"></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <input type="submit" value="Post" class="btn login-btn btn-warning float-right">
+
+            </div>
+        </form>
+    {% if message %}
+    {{ message }}
+    {% endif %}
+</div>
+{% endblock %}

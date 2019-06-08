@@ -12,6 +12,18 @@
     text-align: center;
 }
 
+#guides{
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    padding-left: 0%;
+}
+
+#guides a{
+    text-decoration: none;
+}
+
 @media (min-width: 768px){
     #full{
         margin: auto;

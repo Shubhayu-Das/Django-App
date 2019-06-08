@@ -1,0 +1,24 @@
+#viewAll{
+    width: 80%;
+    margin: auto;
+    padding-top: calc(5vh);
+}
+
+#sender{
+    text-decoration: none;
+    font-size: calc(3vh);
+}
+
+#messageTable{
+    padding-top: calc(3vh);
+}
+
+th, td{
+    text-align: center;
+}
+
+@media (min-width: 768px){
+    #viewAll{
+        width: 60%;
+    }
+}

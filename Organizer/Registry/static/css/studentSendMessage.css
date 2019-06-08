@@ -1,0 +1,25 @@
+#allMessage{
+    width: 60%;
+    margin: auto;
+    padding-top: calc(5vh);
+}
+
+#back{
+    font-size: calc(3vh);
+    text-decoration: none;
+}
+
+#post{
+    padding-top: calc(1vh);
+}
+
+#tag{
+    font-size: calc(2.5vh);
+    padding-top: calc(1vh);
+}
+
+@media (max-width: 768px){
+    #allMessage{
+        width: 80%;
+    }
+}

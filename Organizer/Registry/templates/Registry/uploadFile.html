@@ -9,10 +9,37 @@
     <div id = "upload">
     <form method="POST" enctype="multipart/form-data" class = "md-form">
         {% csrf_token %}
-        <div id = "aligners"><label id = "file-message"> File description: </label></div>
+        <label id = "file-message"> File description: </label>
         <textarea rows = '6' class="form-control text-wrap" type="text" name = "description" placeholder="File description / details" id = "file-desc"></textarea>
-        <div id = "aligners"><input type = "file" value="Choose File" name = "files" class = "btn login-btn btn-primary" id = "file-chooser"/></div>
-        <div id = "aligners"><input type = "submit" value = "Upload" class = "btn login-btn btn-primary" id = "file-submit"/></div>
+        <div id = "file-chooser"><input type = "file" value="Choose File" name = "uploadedFile" class = "btn login-btn btn-primary float-right"/></div>
+        
+        <div id = "selectTable">
+            <table class = "table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th> Select all </th>
+                        <th><input type="checkbox" class = "check" name = "selectall"></th>
+                    </tr>
+                    <tr>
+                        <th> Batch 1</th>
+                        <th><input type="checkbox" class = "check" name = "batch1"></th>
+                    </tr>
+                    <tr>
+                        <th> Batch 2 </th>
+                        <th><input type="checkbox" class = "check" name = "batch2"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>    
+                        <td class = "labels">{{ student.username }}</td>
+                        <td><input type="checkbox" class = "check" name = "{{student.id}}"></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <input type = "submit" value = "Upload" class = "btn login-btn btn-primary float-right" id = "file-submit"/>
     </form>
 </div>
 {% endblock %}

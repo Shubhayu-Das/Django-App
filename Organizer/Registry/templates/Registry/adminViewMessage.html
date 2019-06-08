@@ -1,0 +1,65 @@
+{% extends "Registry/adminBase.html" %}
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href = {% static "css/adminViewMessage.css" %}>
+{% endblock %}
+
+{% block body %}
+    <div id = 'allMessage'>
+        <p id = 'sender'>   <a href="{% url 'adminSendMessage' %}">Send a message</a> </p>
+
+        <p id = "tags"> Messages received: </p>
+        <table class = "table table-bordered striped" id ="receivedMessages">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Message</th>
+                    <th>Sender</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for message in received %}
+                <tr>
+                    <td> <a href="#post{{message.id}}" data-toggle="collapse" class="accordion-toggle"> {{ message.brief }} </a> </td>
+                    <td>{{ message.dates }}</td> 
+                    <td>{{ message.sender }}</td>
+                </tr>
+                <tr>
+                <td colspan="3" id = "post{{message.id}}" class="accordion-body collapse in">
+                        {{ message.posts }}
+                </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <br><br><br>
+
+        <p id = "tags">Messages sent:</p>
+        <table class = "table table-bordered striped" id = "sentMessages">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Message</th>
+                    <th>Receivers</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for message in sent %}
+                <tr>
+                    <td> <a href="#post{{message.id}}" data-toggle="collapse" class="accordion-toggle"> {{ message.brief }} </a> </td>
+                    <td>{{ message.dates }}</td>
+                    <td>{{ message.receivers }}</td> 
+                </tr>
+                <tr>
+                    <td colspan="3" id = "post{{message.id}}" class="accordion-body collapse in">
+                            {{ message.posts }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+{% endblock %}

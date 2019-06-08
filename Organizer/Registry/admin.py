@@ -4,7 +4,7 @@ from .models import Message, storeData, FileUpload
 #admin.site.register(Message)
 @admin.register(FileUpload)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('description', 'files', 'upload_time')
+    list_display = ('description', 'uploadedFile', 'upload_time')
     ordering = ('upload_time', )
     search_fields = ('description', 'upload_time')
 

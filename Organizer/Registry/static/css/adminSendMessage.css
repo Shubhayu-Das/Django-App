@@ -1,18 +1,11 @@
-#upload{
-    position: relative;
-    top: calc(3vh);
+#allMessage{
     width: 60%;
     margin: auto;
+    padding-top: calc(5vh);
 }
 
-#file-message{
+#tag{
     font-size: calc(3vh);
-    padding-bottom: calc(1vh);
-}
-
-#file-chooser{
-    margin-top: calc(3vh);
-    padding-bottom: calc(3vh);
 }
 
 #selectTable{
@@ -22,10 +15,9 @@
 }
 
 @media (max-width: 768px){
-    #upload{
+    #allMessage{
         width: 80%;
     }
-
     #selectTable{
         width: 100%;
     }

@@ -7,6 +7,14 @@
 
 {% block body %}
 <div id = "full">
+    <ul id = "guides">
+        <li>
+            <a href="#batch1">Batch 1</a>
+        </li>
+        <li>
+            <a href="#batch2">Batch 2</a>
+        </li>
+    </ul>
     <table class = "table table-striped table-bordered table-hover table-responsive">  
         <thead>
             <tr>
@@ -19,23 +27,47 @@
             </tr>
         </thead>
         <tbody>
-        {% for user in users %}
-        <tr>
-                <td class = 'name'>{{ user.name }}</td>
-                <td>{{ user.phoneNumber }}</td>
-                
-                {% if user.feesStatus%}
-                    <td>Paid</td>
-                {% else %}
-                    <td>Not paid</td>
-                {% endif %}
+                <tr>
+                    <th colspan="6" id = "batch1">Batch 1</th>
+                </tr>
+            {% for user in batch1 %}
+            <tr>
+                    <td class = 'name'>{{ user.name }}</td>
+                    <td>{{ user.phoneNumber }}</td>
+                    
+                    {% if user.feesStatus%}
+                        <td>Paid</td>
+                    {% else %}
+                        <td>Not paid</td>
+                    {% endif %}
 
-                <td>{{ user.classesAttended }}</td>
-                <td>{{ user.lastAttended }}</td>
-                <td>{{ user.isValidated }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
+                    <td>{{ user.classesAttended }}</td>
+                    <td>{{ user.lastAttended }}</td>
+                    <td>{{ user.isValidated }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tbody>
+                <tr>
+                    <th colspan="6" id = "batch2">Batch 2</th>
+                </tr>
+            {% for user in batch2 %}
+            <tr>
+                    <td class = 'name'>{{ user.name }}</td>
+                    <td>{{ user.phoneNumber }}</td>
+                    
+                    {% if user.feesStatus%}
+                        <td>Paid</td>
+                    {% else %}
+                        <td>Not paid</td>
+                    {% endif %}
+
+                    <td>{{ user.classesAttended }}</td>
+                    <td>{{ user.lastAttended }}</td>
+                    <td>{{ user.isValidated }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
     
 </div>

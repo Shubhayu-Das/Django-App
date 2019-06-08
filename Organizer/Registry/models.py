@@ -8,6 +8,7 @@ class storeData(models.Model):
     
     phone_regex = RegexValidator(regex = r'^[0-9]{10}$', message = "Phone number must be of the form: 9876543210.")
     phone_number = models.CharField(validators = [phone_regex], max_length=11, verbose_name = "Phone Number")
+    batch_number = models.IntegerField(default = 0, verbose_name = "Batch number")
     
     password = models.CharField(max_length = 30, verbose_name = "Password")
     
@@ -20,13 +21,7 @@ class storeData(models.Model):
     is_superuser = models.BooleanField(default = False)
     is_logged_in = models.BooleanField(default = False, verbose_name = "Logged in status")
     mac_address = models.BigIntegerField(default = 0)
-    '''
-    def is_logged_in(self):
-        return self.is_logged_in
 
-    def is_superuser(self):
-        return self.is_superuser
-    '''
 
 class Message(models.Model):
 
@@ -34,13 +29,13 @@ class Message(models.Model):
     datePosted = models.DateTimeField(auto_now_add = True, verbose_name = "Date Posted: ")
     allowedUsers = models.CharField(max_length = 1000, verbose_name = 'Allowed Users: ')
     sender = models.CharField(max_length = 100, verbose_name = 'Sender: ', default = 'admin')
-    def __str__(self):
-        return self.message[:15]+'...'
-        
+   
     class Meta:
         ordering = ('-datePosted', )
 
+
 class FileUpload(models.Model):
     description = models.CharField(blank = True, max_length = 1000)
-    files = models.FileField(upload_to = 'files/%Y/')
+    uploadedFile = models.FileField(upload_to = 'files/%Y/')
     upload_time = models.DateTimeField(auto_now_add = True)
+    allowedUsers = models.CharField(default = "", max_length = 1000, verbose_name = 'Allowed Users: ')

@@ -23,6 +23,8 @@ class AttendanceForm(forms.Form):
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
 
 class FileUploadForm(forms.ModelForm):
+    choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
+    
     class Meta:
         model = FileUpload
-        fields = ('description', 'files',)
+        fields = ('description', 'uploadedFile')
