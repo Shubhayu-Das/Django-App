@@ -53,14 +53,7 @@
         <h4 class="card-title"  align = "center">Details</h4>
         <p class="card-text"  align = "center">Number of classes attended this month: {{ classesAttended }}</p>
         <p class="card-text"  align = "center">Last class attended on: {{ lastAttended }}</p>
-        <p class="card-text"  align = "center">
-                {% if feeStatus %}
-                    Last month fees paid
-                {% else %}
-                    Last month fees not paid
-                {% endif %}        
-        
-        </p>
+        <p class="card-text"  align = "center">Last fees paid on: {{ feesStatus }}</p>
    
             {% if messages %}
                 <ul class="messages">

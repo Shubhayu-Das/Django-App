@@ -43,13 +43,15 @@
                     <li class = "navbar-nav mr-auto">
                         <a href = "{% url 'adminViewMessage' %}" class = "nav-link">Messages</a>
                     </li>
+                    <li class = "navbar-nav mr-auto">
+                        <a href = "{% url 'uploadFile' %}" class = "nav-link">Materials</a>
+                    </li>
                     {% if requiresValidation %}
                     <li class = "navbar-nav mr-auto">
                         <a href = "{% url 'validateStudent' %}" class = "nav-link">Validate</a>
                     </li>
                     {% endif %}
                 </ul>
-
                 <a href = "{% url 'logout' %}"  class="btn float-right btn-primary" title = "Log out">Log out  <i class="fas fa-sign-out-alt" style = "color: white; padding-left: calc(0.5vw)"></i></a>
             </div>
         </nav>

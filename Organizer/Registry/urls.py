@@ -16,6 +16,6 @@ urlpatterns = [
         path('student-home/student-message/', views.studentViewMessage, name = 'studentViewMessage'),
         path('admin-home/admin-upload-files/', views.uploadFile, name = 'uploadFile'),
         path('student-home/student-message/send/',  views.studentSendMessage, name = 'studentSendMessage'),
-        path('admin-home/student-download-files/', views.downloadFile, name = 'downloadFile'),
-        path('', views.logout, name="logout"),
+        path('student-home/student-download-files/', views.downloadFile, name = 'downloadFile'),
+        path('logout/', views.logout, name="logout"),
 ]

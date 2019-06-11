@@ -29,6 +29,7 @@ def login(request):
             elif response == "No":
                 user = storeData.objects.get(username = username)
                 messages.info(request, str(user.id))
+                request.session['user_info'] = user.id
                 return redirect('/student-home/')
 
             else:
@@ -55,7 +56,6 @@ def register(request):
             phone = request.POST.get('phone_number')
             addr = uuid.getnode()
             Batch = request.POST.get('Batch')
-            print(Batch)
             try:
                 user = storeData.objects.get(mac_address = addr)
                 messages.info(request, 'Looks like you have already registered with this device')
@@ -85,31 +85,24 @@ def loginAdminHome(request):
             appearance = True
     
     args = {'requiresValidation': appearance}
-    print(args['requiresValidation'])
     return render(request, 'Registry/adminBase.html', args)
 
 
 #The home page for the students.
 def loginStudentHome(request):
-    if (systemCheck()):
         
-        userData = {'id': None, 'name': '', 'classesAttended': None, 'lastAttended': None, 'feesStatus': False}
-        user_id = request.session.get('user_info')
-        
-        user = storeData.objects.get(id = user_id)
-        
-        userData['id'] = user.id
-        userData['name'] = user.username
-        userData['classesAttended'] = user.no_of_class_attended
-        userData['lastAttended'] = user.last_class_attended.date()
-        userData['feesStatus'] = user.fee_status
+    userData = {'id': None, 'name': '', 'classesAttended': None, 'lastAttended': None, 'feesStatus': False}
+    user_id = request.session.get('user_info')
+    
+    user = storeData.objects.get(id = user_id)
+    
+    userData['id'] = user.id
+    userData['name'] = user.username
+    userData['classesAttended'] = user.no_of_class_attended
+    userData['lastAttended'] = user.last_class_attended.date()
+    userData['feesStatus'] = user.last_fees_paid.date()
 
-        return render(request, 'Registry/studentBase.html', userData)
-
-    # Deny access without login
-    messages.info(request, "Please login before trying to access user information")
-
-    return HttpResponseRedirect('/')
+    return render(request, 'Registry/studentBase.html', userData)
 
 
 # Show basic data like the email id and the phone number details(Admin page)
@@ -210,7 +203,6 @@ def validateStudent(request):
             for user in storeData.objects.values():
                 response = request.POST.get(str(user['id']))
                 student = storeData.objects.get(id = str(user['id']))
-                print(response)
                 if(response == "Validate"): 
                     student.validated = True
                     student.save()
@@ -372,7 +364,6 @@ def studentSendMessage(request):
                     admin = user
             l = []
             l.append(admin)
-            print("Sent message")
     
             #invoke the message sending function   
             sendMessage(message, l)
@@ -414,27 +405,14 @@ def downloadFile(request):
 
     The authentication is based on the MAC Address of the user.
     
-    fn: systemCheck() --> gets the MAC address of the user while registering and stores it.
-                        During login, checks the state of the login variable in the storeData database
-
     fn: authenticate(username, password) --> checks if the User has entered a valid username-password combination
 
-    fn: userlogout(username) --> Logs out the user onclick
+    fn: logout(username) --> Logs out the user onclick
 
     fn: markPresent(present) --> updates the attendance after taking input from the form
 
     fn: sendMessage(message, recipients) -->  Saves a message to the Message database
 '''
-
-# Get the MAC Address of the user system for authentication purposes
-def systemCheck():
-    addr = uuid.getnode()
-    user = storeData.objects.get(mac_address = addr)
-    if user.is_logged_in == True:
-        return True
-    else:
-        return False
-
 
 # Function to verify if the password is correct or wrong. Further checks for superuser access
 def authenticate(username = None, password = None):
@@ -458,19 +436,19 @@ def authenticate(username = None, password = None):
     if user.is_superuser == True:
         return "Yes"
     else:
-        print("Loggable")
         return "No"
 
     return "None"
 
 
 # Log out the user on button click
-def logout(username):
-    user = storeData.objects.get(username = username)
+def logout(request):
+    userId = request.session.get('user_info')
+    user = storeData.objects.get(id = userId)
     user.is_logged_in = False
     user.save()
-    
-    return HttpResponseRedirect('')
+    print('here')
+    return redirect('home')
 
 # Function to update the attendance of the students
 def markPresent(present):
