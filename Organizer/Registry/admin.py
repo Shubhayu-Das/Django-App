@@ -16,6 +16,6 @@ class PostAdmin(admin.ModelAdmin):
 
 @admin.register(storeData)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('username', 'phone_number', 'no_of_class_attended', 'fee_status', 'validated', 'is_logged_in',)
+    list_display = ('username', 'phone_number', 'no_of_class_attended', 'last_fees_paid', 'validated', 'is_logged_in',)
     ordering = ('username', )
-    search_fields = ('username', 'phone_number', 'fee_status', 'validated')
+    search_fields = ('username', 'phone_number', 'last_fees_paid', 'validated')

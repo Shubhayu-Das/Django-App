@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponseRedirect, redirect
-from .forms import LoginForm, SelectStudentForm, RegistrationForm, AttendanceForm, FileUploadForm, ValidationForm
+from .forms import *
 from datetime import datetime
 from .models import Message, storeData, FileUpload
 from django.contrib import messages
@@ -21,7 +21,7 @@ def login(request):
             username = request.POST.get('username')
             password = request.POST.get('password')
 
-            response = authenticate(request, username=username, password=password)
+            response = authenticate(username=username, password=password)
 
             if response == 'Yes':         
                 return redirect('/admin-home/')
@@ -29,7 +29,6 @@ def login(request):
             elif response == "No":
                 user = storeData.objects.get(username = username)
                 messages.info(request, str(user.id))
-                request.session['user_info'] = user.id
                 return redirect('/student-home/')
 
             else:
@@ -56,7 +55,7 @@ def register(request):
             phone = request.POST.get('phone_number')
             addr = uuid.getnode()
             Batch = request.POST.get('Batch')
-    
+            print(Batch)
             try:
                 user = storeData.objects.get(mac_address = addr)
                 messages.info(request, 'Looks like you have already registered with this device')
@@ -64,7 +63,8 @@ def register(request):
                 return HttpResponseRedirect('/')
             
             except:
-                storeData.objects.create(username = username, password = password, phone_number = phone, mac_address = addr, batch_number = Batch)
+                newUser = storeData(username = username, password = password, phone_number = phone, mac_address = addr, batch_number = Batch)
+                newUser.save()
                 messages.info(request, 'Your registration is complete. Please wait for the administrator to validate your account')
             
                 return HttpResponseRedirect('/')
@@ -79,7 +79,14 @@ def register(request):
 
 # Leads to the home page for the admin, where all the attendance, fees and other activities are there
 def loginAdminHome(request):
-    return render(request, 'Registry/adminBase.html')
+    appearance = False
+    for user in storeData.objects.values():
+        if not user['validated']:
+            appearance = True
+    
+    args = {'requiresValidation': appearance}
+    print(args['requiresValidation'])
+    return render(request, 'Registry/adminBase.html', args)
 
 
 #The home page for the students.
@@ -112,7 +119,7 @@ def studentsData(request):
     
     for user in storeData.objects.values():
     
-        if not user['is_superuser']:
+        if not user['is_superuser'] and user['validated']:
     
             temp = {'id': None, 'name': '', 'phoneNumber': '', 'classesAttended': None, 'lastAttended': None, 'feesStatus': False, 'isValidated': False}
             
@@ -121,8 +128,6 @@ def studentsData(request):
             temp['phoneNumber'] = (user['phone_number'])
             temp['classesAttended'] = (user['no_of_class_attended'])
             temp['lastAttended'] = (user['last_class_attended'].date())
-            temp['feesStatus'] = (user['fee_status'])
-            temp['isValidated'] = (user['validated'])
 
             if user['batch_number'] == 1:
                 args['batch1'].append(temp)
@@ -154,7 +159,7 @@ def attendance(request):
         LIST_OF_CHOICES_2 = []
         form = AttendanceForm()
         for user in storeData.objects.values():
-            if not user['is_superuser']:
+            if not user['is_superuser'] and user['validated']:
                 if user['batch_number'] == 1:
                     LIST_OF_CHOICES_1.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastAttended': user['last_class_attended'].date()})
                 else:
@@ -167,7 +172,65 @@ def attendance(request):
 
 # The last fees paid date
 def fees(request):
-    return render(request, 'Registry/fees.html')
+
+    args = {}
+
+    if request.method == 'POST':
+        present = []
+        form = AttendanceForm(request.POST)
+
+        if form.is_valid:
+            for user in storeData.objects.values():
+                if request.POST.get(str(user['id'])):
+                    User = storeData.objects.get(id = str(user['id']))
+                    User.last_fees_paid = datetime.now()
+                    User.save()
+                    
+            return redirect('fees')
+
+    else:
+        LIST_OF_CHOICES_1 = []
+        LIST_OF_CHOICES_2 = []
+        form = AttendanceForm()
+        for user in storeData.objects.values():
+            if not user['is_superuser'] and user['validated']:
+                if user['batch_number'] == 1:
+                    LIST_OF_CHOICES_1.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastFeesPaid': user['last_fees_paid'].date()})
+                else:
+                    LIST_OF_CHOICES_2.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastFeesPaid': user['last_fees_paid'].date()})
+
+        args = {'form': form ,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
+
+    return render(request, 'Registry/fees.html', args)
+
+def validateStudent(request):
+    if request.method == 'POST':
+        form = ValidationForm(request.POST)
+        if form.is_valid:
+            for user in storeData.objects.values():
+                response = request.POST.get(str(user['id']))
+                student = storeData.objects.get(id = str(user['id']))
+                print(response)
+                if(response == "Validate"): 
+                    student.validated = True
+                    student.save()
+                elif(response == "Discard"):
+                    student.delete()
+            return redirect('home')
+        #List of unvalidated users.
+    else:
+        form = ValidationForm()
+        users = []
+        delete = []
+        for user in storeData.objects.values():
+            if(user['validated'] == False):
+                users.append({'name': user['username'], 'batch': user['batch_number'], "id": user['id']})
+
+            if(user['is_superuser'] == False):
+                delete.append({'name': user['username'], 'batch': user['batch_number'], 'id': user['id']})
+
+    return render(request, 'Registry/validate.html', {'users': users})
+
 
 def adminViewMessage(request):
     final = {'received': [], 'sent': []}
@@ -235,7 +298,7 @@ def adminSendMessage(request):
         LIST_OF_CHOICES = []
 
         for user in storeData.objects.values():
-            if not user['is_superuser']:
+            if not user['is_superuser'] and user['validated']:
                 LIST_OF_CHOICES.append(user)
 
         args = {"form": form, "students": LIST_OF_CHOICES}
@@ -374,14 +437,14 @@ def systemCheck():
 
 
 # Function to verify if the password is correct or wrong. Further checks for superuser access
-def authenticate(request, username = None, password = None):
+def authenticate(username = None, password = None):
     
     try:
         user = storeData.objects.get(username = username)
     except:
         return "None"
-    
-    if password == user.password and user.validated == True:
+
+    if password == user.password:
         user.is_logged_in = True
         user.save()
 
@@ -395,6 +458,7 @@ def authenticate(request, username = None, password = None):
     if user.is_superuser == True:
         return "Yes"
     else:
+        print("Loggable")
         return "No"
 
     return "None"
@@ -439,26 +503,3 @@ def upload(recipients):
     newFile = FileUpload.objects.all()[len(FileUpload.objects.all())-1]    
     newFile.allowedUsers = receivers
     newFile.save()
-
-def validateStudent(request):
-    if request.method == 'POST':
-        form = ValidationForm(request.POST)
-        if form.is_valid:
-            for user in storeData.objects.values():
-                response = request.POST.get(user['username'])
-                user = storeData.objects.get(username = user['username'])
-                
-                if(response == "Validate"): 
-                    user.validated = True
-                    user.save()
-                elif(response == "Discard"):
-                    user.delete()
-            return redirect('validateStudent')
-        #List of unvalidated users.
-    else:
-        form = ValidationForm()
-        users = []
-        for user in storeData.objects.values():
-            if(user['validated'] == False):
-                users.append(user['username'])
-    return render(request, 'Registry/validate.html', {'users': users})

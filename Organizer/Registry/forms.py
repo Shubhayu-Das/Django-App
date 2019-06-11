@@ -34,3 +34,7 @@ class ValidationForm(forms.Form):
     model = storeData
     CHOICE = [('1', 'Validate'), ('2', 'Discard')]
     choices = forms.MultipleChoiceField(widget=forms.RadioSelect, choices=CHOICE, required = False)
+
+class FeesPaid(forms.Form):
+    model = storeData
+    choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)

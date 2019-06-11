@@ -20,51 +20,33 @@
             <tr>
                 <th class = 'name'>Name</th>
                 <th>Phone Number</th>
-                <th>Fees Status</th>
                 <th>Number of classes attended</th>
                 <th>Last attended on</th>
-                <th>Account validated</th>
             </tr>
         </thead>
         <tbody>
                 <tr>
-                    <th colspan="6" id = "batch1">Batch 1</th>
+                    <th colspan="4" id = "batch1">Batch 1</th>
                 </tr>
             {% for user in batch1 %}
             <tr>
                     <td class = 'name'>{{ user.name }}</td>
                     <td>{{ user.phoneNumber }}</td>
-                    
-                    {% if user.feesStatus%}
-                        <td>Paid</td>
-                    {% else %}
-                        <td>Not paid</td>
-                    {% endif %}
-
                     <td>{{ user.classesAttended }}</td>
                     <td>{{ user.lastAttended }}</td>
-                    <td>{{ user.isValidated }}</td>
             </tr>
             {% endfor %}
         </tbody>
         <tbody>
                 <tr>
-                    <th colspan="6" id = "batch2">Batch 2</th>
+                    <th colspan="4" id = "batch2">Batch 2</th>
                 </tr>
             {% for user in batch2 %}
             <tr>
                     <td class = 'name'>{{ user.name }}</td>
                     <td>{{ user.phoneNumber }}</td>
-                    
-                    {% if user.feesStatus%}
-                        <td>Paid</td>
-                    {% else %}
-                        <td>Not paid</td>
-                    {% endif %}
-
                     <td>{{ user.classesAttended }}</td>
                     <td>{{ user.lastAttended }}</td>
-                    <td>{{ user.isValidated }}</td>
             </tr>
             {% endfor %}
         </tbody>

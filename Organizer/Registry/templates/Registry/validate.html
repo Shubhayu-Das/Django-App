@@ -2,27 +2,29 @@
 {% load static %}
 
 {% block style %}
-    <link rel="stylesheet" href = {% static "css/adminSendMessage.css" %}>
+    <link rel="stylesheet" href = {% static "css/validate.css" %}>
 {% endblock %}
 
 {% block body %}
-<div id="full" margin: auto;>
+<div id="full">
 <form method="POST" id = "form">
     {% csrf_token %}
 <table style="margin: auto" class = "table table-striped table-bordered table-hover table-responsive">
     <thead>
         <tr>
-            <th class = 'name'>Name</th>
-            <th>Validate</th>
-            <th>Discard</th>
+            <th>Name</th>
+            <th>Batch</th>
+            <th>Accept</th>
+            <th>Delete</th>
         </tr>
         </thead>
         <tbody>
     {% for user in users %}
     <tr>
-        <td class="name">{{ user }}</td>
-        <td><input type="radio" name = "{{ user }}" value= "Validate"></td>
-        <td><input type="radio" name = "{{ user }}" value="Discard"></td>
+        <td>{{ user.name }}</td>
+        <td>{{ user.batch }}</td>
+        <td><input type="radio" name = "{{user.id}}" value= "Validate"></td>
+        <td><input type="radio" name = "{{user.id}}" value="Discard"></td>
     </tr>
         {% endfor %}
     </tbody>

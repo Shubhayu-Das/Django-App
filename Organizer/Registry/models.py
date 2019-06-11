@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.core.validators import RegexValidator
+import datetime
 
 class storeData(models.Model):
     id = models.AutoField(primary_key=True)
@@ -15,7 +16,7 @@ class storeData(models.Model):
     no_of_class_attended = models.IntegerField(default = 0)
     last_class_attended = models.DateTimeField(auto_now = True)
     
-    fee_status = models.BooleanField(default = False)
+    last_fees_paid = models.DateTimeField(default = datetime.datetime(1970, 1, 1))
     validated = models.BooleanField(default = False)
     
     is_superuser = models.BooleanField(default = False)
