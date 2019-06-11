@@ -1,5 +1,5 @@
 from django.shortcuts import render, HttpResponseRedirect, redirect
-from .forms import LoginForm, SelectStudentForm, RegistrationForm, AttendanceForm, FileUploadForm
+from .forms import LoginForm, SelectStudentForm, RegistrationForm, AttendanceForm, FileUploadForm, ValidationForm
 from datetime import datetime
 from .models import Message, storeData, FileUpload
 from django.contrib import messages
@@ -21,7 +21,7 @@ def login(request):
             username = request.POST.get('username')
             password = request.POST.get('password')
 
-            response = authenticate(username=username, password=password)
+            response = authenticate(request, username=username, password=password)
 
             if response == 'Yes':         
                 return redirect('/admin-home/')
@@ -33,7 +33,7 @@ def login(request):
                 return redirect('/student-home/')
 
             else:
-                return redirect('/home/')
+                return redirect('/')
         
         else:
             print(form.errors)
@@ -55,18 +55,19 @@ def register(request):
             password = request.POST.get('password')
             phone = request.POST.get('phone_number')
             addr = uuid.getnode()
+            Batch = request.POST.get('Batch')
     
             try:
                 user = storeData.objects.get(mac_address = addr)
                 messages.info(request, 'Looks like you have already registered with this device')
                 
-                return HttpResponseRedirect('/home/')
+                return HttpResponseRedirect('/')
             
             except:
-                storeData.objects.create(username = username, password = password, phone_number = phone, mac_address = addr)
+                storeData.objects.create(username = username, password = password, phone_number = phone, mac_address = addr, batch_number = Batch)
                 messages.info(request, 'Your registration is complete. Please wait for the administrator to validate your account')
             
-                return HttpResponseRedirect('/home/')
+                return HttpResponseRedirect('/')
     
     else:
         form = RegistrationForm()
@@ -101,7 +102,7 @@ def loginStudentHome(request):
     # Deny access without login
     messages.info(request, "Please login before trying to access user information")
 
-    return HttpResponseRedirect('/home/')
+    return HttpResponseRedirect('/')
 
 
 # Show basic data like the email id and the phone number details(Admin page)
@@ -373,7 +374,7 @@ def systemCheck():
 
 
 # Function to verify if the password is correct or wrong. Further checks for superuser access
-def authenticate(username = None, password = None):
+def authenticate(request, username = None, password = None):
     
     try:
         user = storeData.objects.get(username = username)
@@ -438,3 +439,26 @@ def upload(recipients):
     newFile = FileUpload.objects.all()[len(FileUpload.objects.all())-1]    
     newFile.allowedUsers = receivers
     newFile.save()
+
+def validateStudent(request):
+    if request.method == 'POST':
+        form = ValidationForm(request.POST)
+        if form.is_valid:
+            for user in storeData.objects.values():
+                response = request.POST.get(user['username'])
+                user = storeData.objects.get(username = user['username'])
+                
+                if(response == "Validate"): 
+                    user.validated = True
+                    user.save()
+                elif(response == "Discard"):
+                    user.delete()
+            return redirect('validateStudent')
+        #List of unvalidated users.
+    else:
+        form = ValidationForm()
+        users = []
+        for user in storeData.objects.values():
+            if(user['validated'] == False):
+                users.append(user['username'])
+    return render(request, 'Registry/validate.html', {'users': users})

@@ -14,7 +14,8 @@ class RegistrationForm(forms.ModelForm):
     username = forms.CharField()
     password = forms.CharField(widget = forms.PasswordInput)
     phone_number = forms.CharField()
-    
+    CHOICE = (('1', 'First',), ('2', 'Second',))
+    Batch = forms.ChoiceField(widget = forms.RadioSelect, choices = CHOICE)
     class Meta:
         model = storeData
         fields = ('username', 'phone_number', 'password',)
@@ -28,3 +29,8 @@ class FileUploadForm(forms.ModelForm):
     class Meta:
         model = FileUpload
         fields = ('description', 'uploadedFile')
+
+class ValidationForm(forms.Form):
+    model = storeData
+    CHOICE = [('1', 'Validate'), ('2', 'Discard')]
+    choices = forms.MultipleChoiceField(widget=forms.RadioSelect, choices=CHOICE, required = False)

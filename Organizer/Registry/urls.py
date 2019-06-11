@@ -12,6 +12,7 @@ urlpatterns = [
         path('admin-home/fees/', views.fees, name = 'fees'),
         path('admin-home/admin-message/', views.adminViewMessage, name = 'adminViewMessage'),
         path('admin-home/admin-message/send/', views.adminSendMessage, name = 'adminSendMessage'),
+        path('admin-home/validate/', views.validateStudent, name = 'validateStudent'),
         path('student-home/student-message/', views.studentViewMessage, name = 'studentViewMessage'),
         path('admin-home/admin-upload-files/', views.uploadFile, name = 'uploadFile'),
         path('student-home/student-message/send/',  views.studentSendMessage, name = 'studentSendMessage'),
