@@ -21,7 +21,7 @@ def login(request):
             username = request.POST.get('username')
             password = request.POST.get('password')
 
-            response = authenticate(username=username, password=password)
+            response = authenticate(request, username=username, password=password)
 
             if response == 'Yes':         
                 return redirect('/admin-home/')
@@ -90,20 +90,24 @@ def loginAdminHome(request):
 
 #The home page for the students.
 def loginStudentHome(request):
-        
-    userData = {'id': None, 'name': '', 'classesAttended': None, 'lastAttended': None, 'feesStatus': False}
-    user_id = request.session.get('user_info')
-    
-    user = storeData.objects.get(id = user_id)
-    
-    userData['id'] = user.id
-    userData['name'] = user.username
-    userData['classesAttended'] = user.no_of_class_attended
-    userData['lastAttended'] = user.last_class_attended.date()
-    userData['feesStatus'] = user.last_fees_paid.date()
 
-    return render(request, 'Registry/studentBase.html', userData)
+    if checkStatus(request) != -1:
 
+        userData = {'id': None, 'name': '', 'classesAttended': None, 'lastAttended': None, 'feesStatus': False}
+        try:
+            user_id = request.session.get('user_info')
+            user = storeData.objects.get(id = user_id)  
+            userData['id'] = user.id
+            userData['name'] = user.username
+            userData['classesAttended'] = user.no_of_class_attended
+            userData['lastAttended'] = user.last_class_attended.date()
+            userData['feesStatus'] = user.last_fees_paid.date()
+            return render(request, 'Registry/studentBase.html', userData)
+        except:
+            messages.info(request, "Please login before trying to access student info")
+            return redirect('home')
+    messages.info(request, "You have logged out. Please login again to access content")
+    return redirect('home')
 
 # Show basic data like the email id and the phone number details(Admin page)
 def studentsData(request):
@@ -366,7 +370,7 @@ def studentSendMessage(request):
             l.append(admin)
     
             #invoke the message sending function   
-            sendMessage(message, l)
+            sendMessage(request, message, l)
     
             messages.info(request, 'Message has been sent.')
     
@@ -384,8 +388,9 @@ def studentViewMessage(request):
     final = {'message': []}
 
     addr = uuid.getnode()
-    user = storeData.objects.get(mac_address = addr)
-    
+    #user = storeData.objects.get(mac_address = addr)
+    userId = request.session.get('user_info')
+    user = storeData.objects.get(id = userId)
     for message in Message.objects.values():
 
         if str(user.username) in (message['allowedUsers']):
@@ -415,13 +420,13 @@ def downloadFile(request):
 '''
 
 # Function to verify if the password is correct or wrong. Further checks for superuser access
-def authenticate(username = None, password = None):
+def authenticate(request, username = None, password = None):
     
     try:
         user = storeData.objects.get(username = username)
     except:
+        messages.info(request, "Enter valid username")
         return "None"
-
     if password == user.password:
         user.is_logged_in = True
         user.save()
@@ -448,6 +453,7 @@ def logout(request):
     user.is_logged_in = False
     user.save()
     print('here')
+    request.session['user_info'] = -1
     return redirect('home')
 
 # Function to update the attendance of the students
@@ -459,14 +465,13 @@ def markPresent(present):
         person.save()
 
 # Save a Message entry from both students and the admin(s)
-def sendMessage(message, recipients):
+def sendMessage(request, message, recipients):
     receivers = []
     
     for user in recipients:
         receivers.append(user['username'])
-    
-    sender = storeData.objects.get(mac_address = uuid.getnode())
-    
+    userId = request.session.get('user_info')
+    sender = storeData.objects.get(id = userId)
     message = Message(message = message, allowedUsers = repr(receivers), sender = sender.username)
     
     message.save()
@@ -481,3 +486,7 @@ def upload(recipients):
     newFile = FileUpload.objects.all()[len(FileUpload.objects.all())-1]    
     newFile.allowedUsers = receivers
     newFile.save()
+
+def checkStatus(request):
+    userId = request.session.get('user_info')
+    return userId
