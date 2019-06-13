@@ -29,15 +29,26 @@
 
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
+                {% if messagesUnseen > 0 or filesUnseen > 0 %}
+                    <span class = "badge badge-danger">{{ messagesUnseen }}</span>
+                {% endif %}
             </button>
 
             <div class = "collapse navbar-collapse" id = "navbarContent">
                 <ul class="navbar-nav mr-auto">
                     <li class = "navbar-nav mr-auto">
-                        <a href = "{% url 'studentViewMessage' %}" class = "nav-link">Messages</a>
+                        <a href = "{% url 'studentViewMessage' %}" class = "nav-link">Messages
+                            {% if messagesUnseen > 0 %}
+                                <span class = "badge badge-danger">{{ messagesUnseen }}</span>
+                            {% endif %}
+                        </a>
                     </li>
                     <li class = "navbar-nav mr-auto">
-                        <a href = "{% url 'downloadFile' %}" class = "nav-link">Material</a>
+                        <a href = "{% url 'downloadFile' %}" class = "nav-link">Material
+                            {% if filesUnseen > 0 %}
+                                <span class= "badge badge-success">{{ filesUnseen }}</span>
+                            {% endif %}
+                        </a>
                     </li>
                 </ul>
                 <a href = "{% url 'logout' %}"  class="btn float-right btn-primary" title = "Log out" id = "logout">Log out  <i class="fas fa-sign-out-alt" style = "color: white; padding-left: calc(0.5vw)"></i></a>

@@ -3,7 +3,6 @@ from .forms import *
 from datetime import datetime
 from .models import Message, storeData, FileUpload
 from django.contrib import messages
-import uuid
 
 
 
@@ -24,6 +23,8 @@ def login(request):
             response = authenticate(request, username=username, password=password)
 
             if response == 'Yes':         
+                user = storeData.objects.get(username = username)
+                request.session['user_info'] = user.id
                 return redirect('/admin-home/')
 
             elif response == "No":
@@ -54,16 +55,13 @@ def register(request):
             username = request.POST.get('username')
             password = request.POST.get('password')
             phone = request.POST.get('phone_number')
-            addr = uuid.getnode()
             Batch = request.POST.get('Batch')
             try:
-                user = storeData.objects.get(mac_address = addr)
-                messages.info(request, 'Looks like you have already registered with this device')
-                
-                return HttpResponseRedirect('/')
+                user = storeData.objects.get(username = username, phone_number = phone)
+                errorMessage(request, 'accountExists')                
             
             except:
-                newUser = storeData(username = username, password = password, phone_number = phone, mac_address = addr, batch_number = Batch)
+                newUser = storeData(username = username, password = password, phone_number = phone, batch_number = Batch)
                 newUser.save()
                 messages.info(request, 'Your registration is complete. Please wait for the administrator to validate your account')
             
@@ -83,15 +81,16 @@ def loginAdminHome(request):
     for user in storeData.objects.values():
         if not user['validated']:
             appearance = True
-    
-    args = {'requiresValidation': appearance}
+
+    user = storeData.objects.get(id = request.session.get('user_info'))
+    args = {'requiresValidation': appearance, 'messagesUnseen': user.unseen_message_count}
     return render(request, 'Registry/adminBase.html', args)
 
 
 #The home page for the students.
 def loginStudentHome(request):
 
-    if checkStatus(request) != -1:
+    if checkStatus(request):
 
         userData = {'id': None, 'name': '', 'classesAttended': None, 'lastAttended': None, 'feesStatus': False}
         try:
@@ -102,11 +101,15 @@ def loginStudentHome(request):
             userData['classesAttended'] = user.no_of_class_attended
             userData['lastAttended'] = user.last_class_attended.date()
             userData['feesStatus'] = user.last_fees_paid.date()
+            userData['messagesUnseen'] = user.unseen_message_count
+            userData['filesUnseen'] = user.unseen_file_count
+
             return render(request, 'Registry/studentBase.html', userData)
         except:
-            messages.info(request, "Please login before trying to access student info")
+            errorMessage(request, "notSignedIn")
             return redirect('home')
-    messages.info(request, "You have logged out. Please login again to access content")
+    
+    errorMessage(request, 'notSignedIn')
     return redirect('home')
 
 # Show basic data like the email id and the phone number details(Admin page)
@@ -230,26 +233,21 @@ def validateStudent(request):
 
 def adminViewMessage(request):
     final = {'received': [], 'sent': []}
-    addr = uuid.getnode()
     user = storeData.objects.get(is_superuser = 1)
+    user.unseen_message_count = 0
+    user.save()
     id = 0
     for message in Message.objects.values():
-        
-        if str(user.username) in (message['allowedUsers']):
-            
-            if message['sender'] == str(user.username):
-                names = ""
 
-                for name in eval(message['allowedUsers']):
-                    names += name + ', ' 
-                
-                names = names[:len(names)-1]
-                final['sent'].append({'id': str(id), 'brief': message['message'][:10]+"...", 'posts': message['message'], 'dates': str(message['datePosted'].date()), 'receivers': names})
-            else:
-                final['received'].append({'id': str(id), 'brief': message['message'][:10]+"...",  'posts': message['message'], 'dates': str(message['datePosted'].date()), 'sender': str(message['sender'])})
-            
+        if message['sender'] == str(user.username):
+            final['sent'].append({'id': str(id), 'brief': message['message'][:10]+"...", 'posts': message['message'], 'dates': str(message['datePosted'].date())})
+
+        if str(user.username) in (message['allowedUsers']):
+            final['received'].append({'id': str(id), 'brief': message['message'][:10]+"...",  'posts': message['message'], 'dates': str(message['datePosted'].date()), 'sender': str(message['sender'])})
+
             id += 1
-          
+    
+    print(final['sent'])
     return render(request, 'Registry/adminViewMessage.html', final)
 
 
@@ -267,6 +265,7 @@ def adminSendMessage(request):
             
             if request.POST.get('selectall'):
                 recipients = storeData.objects.values()
+                recipients.remove(storeData.objects.get(is_superuser = 1))
 
             elif request.POST.get('batch1'):
                 for user in storeData.objects.values():
@@ -284,7 +283,7 @@ def adminSendMessage(request):
                         recipients.append(user)
             
             # Function to save the the message to the database
-            sendMessage(message, recipients)
+            sendMessage(request, message, recipients)
             messages.info(request, 'Message has been sent.')
             
             return redirect('adminhome')
@@ -333,7 +332,7 @@ def uploadFile(request):
                     if request.POST.get(str(user['id'])):
                         recipients.append(user)
             
-            upload(recipients)
+            uploadFile(recipients)
             messages.info(request, 'File has been uploaded.')
             
             return redirect('adminhome')
@@ -353,53 +352,74 @@ def uploadFile(request):
 # Function for the student to send message to the teacher/superusers
 def studentSendMessage(request):
     
-    args = {}
-    
-    if request.method == 'POST':
-    
-        form = SelectStudentForm(request.POST)
-    
-        if form.is_valid:
-    
-            message = request.POST['message']
+    if checkStatus(request):
+        args = {}
+        
+        if request.method == 'POST':
+        
+            form = SelectStudentForm(request.POST)
+        
+            if form.is_valid:
+        
+                message = request.POST['message']
 
-            for user in storeData.objects.values():
-                if user['is_superuser'] == True:
-                    admin = user
-            l = []
-            l.append(admin)
+                for user in storeData.objects.values():
+                    if user['is_superuser'] == True:
+                        admin = user
+                        user.unseen_message_count += 1
+                        user.save()
+                l = []
+                l.append(admin)
+        
+                #invoke the message sending function   
+                sendMessage(request, message, l)
+        
+                messages.info(request, 'Message has been sent.')
+        
+                return redirect('/student-home')
+        
+        else:
+        
+                form = SelectStudentForm()
+                args = {"form": form}
+        return render(request, 'Registry/studentSendMessage.html', args)
     
-            #invoke the message sending function   
-            sendMessage(request, message, l)
-    
-            messages.info(request, 'Message has been sent.')
-    
-            return redirect('/student-home')
-    
-    else:
-    
-            form = SelectStudentForm()
-            args = {"form": form}
-    return render(request, 'Registry/studentSendMessage.html', args)
+    errorMessage(request, 'notSignedIn')
+    return redirect('home')
     
 
 # A function for the students to see the messages sent by the admin
 def studentViewMessage(request):
-    final = {'message': []}
 
-    addr = uuid.getnode()
-    #user = storeData.objects.get(mac_address = addr)
-    userId = request.session.get('user_info')
-    user = storeData.objects.get(id = userId)
-    for message in Message.objects.values():
+    if checkStatus(request):
+        
+        try:
+            final = {'message': []}
+            userId = request.session.get('user_info')
+            user = storeData.objects.get(id = userId)
+            user.unseen_message_count = 0
+            user.save()
 
-        if str(user.username) in (message['allowedUsers']):
-            final['message'].append({'posts': message['message'], 'dates': str(message['datePosted'].date()) })
+            for message in Message.objects.values():
+
+                if str(user.username) in (message['allowedUsers']):
+                    final['message'].append({'posts': message['message'], 'dates': str(message['datePosted'].date()) })
+            
+            return render(request, 'Registry/studentViewMessage.html', final)
+        
+        except:
+            errorMessage(request, 'notSignedIn')
+            return redirect('home')
     
-    return render(request, 'Registry/studentViewMessage.html', final)
+    errorMessage(request,  'notSignedIn')
+    return redirect('home')
 
 def downloadFile(request):
-    return render(request, 'Registry/downloadFile.html')
+    if checkStatus(request):
+        return render(request, 'Registry/downloadFile.html')
+    
+    errorMessage(request,  'notSignedIn')
+    return redirect('home')
 
 '''------------------------------------------------------------------------------------------------------------------------------------------------'''
 ''' 
@@ -433,9 +453,9 @@ def authenticate(request, username = None, password = None):
 
     else:
         if password != user.password:
-            messages.info(request, 'Please enter the correct password')
+            errorMessage(request, "wrongPassword")
         else:
-            messages.info(request, 'Looks like the admin has not authorised your account. Please try later')
+            errorMessage(request, "notValidated")
         return "None"
     
     if user.is_superuser == True:
@@ -449,10 +469,10 @@ def authenticate(request, username = None, password = None):
 # Log out the user on button click
 def logout(request):
     userId = request.session.get('user_info')
+    print(userId)
     user = storeData.objects.get(id = userId)
     user.is_logged_in = False
     user.save()
-    print('here')
     request.session['user_info'] = -1
     return redirect('home')
 
@@ -470,18 +490,24 @@ def sendMessage(request, message, recipients):
     
     for user in recipients:
         receivers.append(user['username'])
+        name = storeData.objects.get(username = user['username'])
+        name.unseen_message_count += 1
+        name.save()
+
     userId = request.session.get('user_info')
     sender = storeData.objects.get(id = userId)
     message = Message(message = message, allowedUsers = repr(receivers), sender = sender.username)
     
     message.save()
 
-def upload(recipients):
-    #pass
+def uploadFile(recipients):
     receivers = []
 
     for user in recipients:
         receivers.append(user['username'])
+        name = storeData.objects.get(username = user['username'])
+        name.unseen_file_count += 1
+        name.save()
 
     newFile = FileUpload.objects.all()[len(FileUpload.objects.all())-1]    
     newFile.allowedUsers = receivers
@@ -489,4 +515,22 @@ def upload(recipients):
 
 def checkStatus(request):
     userId = request.session.get('user_info')
-    return userId
+    if userId is not None and userId is not -1:
+        return True
+    else:
+        return False
+
+def errorMessage(request, errorCode = None):
+    if errorCode == 'notSignedIn':
+        messages.info(request, "You have logged out. Please login again to access content")
+        return redirect('home')
+    
+    elif errorCode == 'notValidated':
+        messages.info(request, 'Looks like the teacher has not approved of your account yet. Please try again later or contact the teacher.')
+
+    elif errorCode == 'accountExists':
+        messages.info(request, 'Looks like there is an account with these credentials already.')
+        return redirect('login')
+    
+    elif errorCode == 'wrongPassword':
+        messages.info(request, 'Please enter the correct password')

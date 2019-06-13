@@ -27,6 +27,9 @@
 
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
+                {% if messagesUnseen > 0 or requiresValidation %}
+                    <span class = "badge badge-danger">{{ messagesUnseen }}</span>
+                {% endif %}
             </button>
 
             <div class = "collapse navbar-collapse" id = "navbarContent">
@@ -41,7 +44,11 @@
                         <a href = "{% url 'fees' %}" class = "nav-link">Fees</a>
                     </li>
                     <li class = "navbar-nav mr-auto">
-                        <a href = "{% url 'adminViewMessage' %}" class = "nav-link">Messages</a>
+                        <a href = "{% url 'adminViewMessage' %}" class = "nav-link">Messages
+                            {% if messagesUnseen > 0 %}
+                                <span class = "badge badge-danger">{{ messagesUnseen }}</span>
+                            {% endif %}
+                        </a>
                     </li>
                     <li class = "navbar-nav mr-auto">
                         <a href = "{% url 'uploadFile' %}" class = "nav-link">Materials</a>

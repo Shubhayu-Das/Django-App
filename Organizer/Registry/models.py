@@ -21,8 +21,8 @@ class storeData(models.Model):
     
     is_superuser = models.BooleanField(default = False)
     is_logged_in = models.BooleanField(default = False, verbose_name = "Logged in status")
-    mac_address = models.BigIntegerField(default = 0)
-
+    unseen_message_count = models.IntegerField(default = 0)
+    unseen_file_count = models.IntegerField(default = 0)
 
 class Message(models.Model):
 
