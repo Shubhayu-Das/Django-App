@@ -38,3 +38,7 @@ class ValidationForm(forms.Form):
 class FeesPaid(forms.Form):
     model = storeData
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
+
+class FileDownloadForm(forms.Form):
+    model = FileUpload
+    choices = forms.ChoiceField(required = False)

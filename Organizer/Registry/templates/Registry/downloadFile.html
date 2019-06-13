@@ -6,5 +6,30 @@
 {% endblock %}
 
 {% block body %}
-Sample Content
+    <div id = "allFiles">
+        <form method="POST" target="_blank">
+            {% csrf_token %}
+            <div id = "encloseTable" class = "col-12 col-sm-10 col-md-6 offset-sm-1 offset-md-3 align-items-center justify-content-center">
+            <table class = "table table-responsive align-items-center">
+                <thead>
+                    <tr>
+                        <th class="mr-auto">File name</th>
+                        <th>Date</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for File in Files %}
+                    <tr>
+                        <td class="mr-auto"> <label for="File.id">{{File.name}}</label> </td>
+                        <td>{{File.date}}</td>
+                        <td> <input type="checkbox" class = "check" id = "{{File.id}}" name = "{{File.id}}"> </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+            <input type="submit" value="Download" class="btn login-btn btn-warning offset-8 offset-sm-5 mr-auto">
+        </form>
+    </div>
 {% endblock %}

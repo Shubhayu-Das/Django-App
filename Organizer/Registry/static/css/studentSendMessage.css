@@ -2,6 +2,7 @@
     width: 60%;
     margin: auto;
     padding-top: calc(5vh);
+    min-height: calc(80vh);
 }
 
 #back{

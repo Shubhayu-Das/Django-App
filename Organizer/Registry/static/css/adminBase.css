@@ -27,13 +27,16 @@ html, body{
 
 .footer{
     position: relative;
-    bottom: 0;
+    bottom: 0%;
     width: 100%;
+    height: min-content;
+    margin-bottom: 0%;
+    padding-bottom: 0%;
 }
 
 #contactLinks{
     color:white;
-    font-size: 30px;
+    font-size: 24px;
 }
 
 #contributors{

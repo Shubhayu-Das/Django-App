@@ -1,7 +1,41 @@
-#viewAll{
-    width: 80%;
+#allMessage{
+    min-height: calc(80vh);
+    width: 60%;
     margin: auto;
-    padding-top: calc(5vh);
+}
+
+.striped > tbody > tr:nth-child(4n+1) > td, .striped > tbody > tr:nth-child(4n+1) > th {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+#receivedMessages{
+    max-width: 60%;
+    margin: auto;
+}
+
+#sentMessages{
+    max-width: 60%;
+    margin: auto;
+    padding: calc(3vh);
+}
+
+#sender{
+    max-width: 60%;
+    margin: auto;
+    padding: 20px;
+    font-size: calc(3vh);
+    padding-left: 0%;
+}
+
+#sender a{
+    text-decoration: none;
+}
+
+#tags{
+    max-width: 60%;
+    margin: auto;
+    font-size: calc(3vh);
+    padding-top: calc(3vh);
 }
 
 #sender{
@@ -11,14 +45,19 @@
 
 #messageTable{
     padding-top: calc(3vh);
+    z-index: -10;
 }
 
 th, td{
     text-align: center;
 }
 
-@media (min-width: 768px){
-    #viewAll{
-        width: 60%;
+@media (max-width: 768px){
+    #receivedMessages, #sentMessages, #sender, #tags{
+        max-width: 80%;
+    }
+
+    #allMessage{
+        width: 95%;
     }
 }

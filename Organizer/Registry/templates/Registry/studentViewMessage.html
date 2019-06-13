@@ -2,34 +2,12 @@
 {% load static %}
 
 {% block style %}
-    <link rel="stylesheet" href = {% static "css/adminViewMessage.css" %}>
+    <link rel="stylesheet" href = {% static "css/studentViewMessage.css" %}>
 {% endblock %}
 
 {% block body %}
-<!--
-    <div id = "viewAll">
-        <a href="{% url 'studentSendMessage' %}" id = "sender">Send message to admin</a>
-        <div id = "messageTable">
-            <table class = "table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th>Message</th>
-                        <th>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for mess in message %}
-                    <tr>
-                        <td> {{ mess.posts }} </td>
-                        <td> {{ mess.dates}} </td> 
-                    </tr>
-                    {% endfor %}
-            </tbody>
-            </table>
-        </div>
-    </div>
--->
-<div id = 'allMessage'>
+
+<div id = "allMessage">
     <p id = 'sender'>   <a href="{% url 'studentSendMessage' %}">Send a message</a> </p>
 
     <p id = "tags"> Messages received: </p>

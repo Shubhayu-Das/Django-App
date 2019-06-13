@@ -1,9 +1,11 @@
-from django.shortcuts import render, HttpResponseRedirect, redirect
 from .forms import *
-from datetime import datetime
 from .models import Message, storeData, FileUpload
+from datetime import datetime
+import os
 from django.contrib import messages
-
+from django.shortcuts import render, HttpResponseRedirect, redirect
+from django.conf import settings
+from django.http import HttpResponse, Http404
 
 
 # The base home page which leads to login/sign up pages
@@ -251,8 +253,8 @@ def adminViewMessage(request):
                 countRcv += 1
         id += 1
         if countRcv == 4 or countSent == 4:
-                break
-    print(final['sent'])
+            break
+
     return render(request, 'Registry/adminViewMessage.html', final)
 
 
@@ -269,18 +271,16 @@ def adminSendMessage(request):
             message = request.POST['message']
             
             if request.POST.get('selectall'):
-                recipients = storeData.objects.values()
-                recipients.remove(storeData.objects.get(is_superuser = 1))
+                recipients = storeData.objects.filter(is_superuser = 0)
+                recipients = recipients.values()
 
             elif request.POST.get('batch1'):
-                for user in storeData.objects.values():
-                    if user['batch_number'] == 1:
-                        recipients.append(user)
+                recipients = storeData.objects.filter(batch_number = 1)
+                recipients = recipients.values()
             
             elif request.POST.get('batch2'):
-                for user in storeData.objects.values():
-                    if user['batch_number'] == 2:
-                        recipients.append(user)
+                recipients = storeData.objects.filter(batch_number = 2)
+                recipients = recipients.values()
 
             else:
                 for user in storeData.objects.values():
@@ -320,27 +320,28 @@ def uploadFile(request):
             form.save()
             
             if request.POST.get('selectall'):
-                recipients = storeData.objects.values()
+                recipients = storeData.objects.filter(is_superuser = 0)
+                recipients = recipients.values()
 
             elif request.POST.get('batch1'):
-                for user in storeData.objects.values():
-                    if user['batch_number'] == 1:
-                        recipients.append(user)
+                recipients = storeData.objects.filter(batch_number = 1)
+                recipients = recipients.values()
             
             elif request.POST.get('batch2'):
-                for user in storeData.objects.values():
-                    if user['batch_number'] == 2:
-                        recipients.append(user)
+                recipients = storeData.objects.filter(batch_number = 2)
+                recipients = recipients.values()
 
             else:
                 for user in storeData.objects.values():
                     if request.POST.get(str(user['id'])):
                         recipients.append(user)
             
-            uploadFile(recipients)
+            upload(recipients)
             messages.info(request, 'File has been uploaded.')
             
             return redirect('adminhome')
+        else:
+            return redirect('uploadFile')
     else:
         form = FileUploadForm()
         LIST_OF_CHOICES = []
@@ -350,9 +351,8 @@ def uploadFile(request):
                 LIST_OF_CHOICES.append(user)
 
         args = {"form": form, "students": LIST_OF_CHOICES}
-        #args = {"form": form}
-
-    return render(request, 'Registry/uploadFile.html', args)
+        print("Here")
+        return render(request, 'Registry/uploadFile.html', args)
 
 # Function for the student to send message to the teacher/superusers
 def studentSendMessage(request):
@@ -427,11 +427,32 @@ def studentViewMessage(request):
     return redirect('home')
 
 def downloadFile(request):
+    args = {"Files": []}
+    userId = request.session.get('user_info')
+    user = storeData.objects.get(id = userId)
+    user.unseen_file_count = 0
+    user.save()
+
     if checkStatus(request):
-        return render(request, 'Registry/downloadFile.html')
+        if request.method == 'POST':
+            form = FileDownloadForm(request.POST)
+
+            if form.is_valid():
+                lst = []
+                for File in FileUpload.objects.values():
+                    if request.POST.get(str(File['id'])):
+                        lst.append(File['id'])
+                return download(lst)
+        else:
+            for File in FileUpload.objects.values():
+                if str(user.username) in File['allowedUsers']:
+                    args["Files"].append({"id": File["id"], "name": os.path.basename(FileUpload.objects.get(id = File['id']).uploadedFile.path), "date": str(File['upload_time'].date())})
+
+            return render(request, 'Registry/downloadFile.html', args)
     
-    errorMessage(request,  'notSignedIn')
-    return redirect('home')
+    else:
+        errorMessage(request,  'notSignedIn')
+        return redirect('home')
 
 '''------------------------------------------------------------------------------------------------------------------------------------------------'''
 ''' 
@@ -512,7 +533,7 @@ def sendMessage(request, message, recipients):
     
     message.save()
 
-def uploadFile(recipients):
+def upload(recipients):
     receivers = []
 
     for user in recipients:
@@ -546,3 +567,29 @@ def errorMessage(request, errorCode = None):
     
     elif errorCode == 'wrongPassword':
         messages.info(request, 'Please enter the correct password')
+
+def download(ids):
+    for id in ids:
+        file_name = FileUpload.objects.get(id = id).uploadedFile.url
+        file_path = settings.MEDIA_ROOT + file_name
+        
+        content_type = None
+        extension = os.path.splitext(file_name)[1][1:]
+        if extension == 'png':
+            content_type = 'image/png'
+        elif extension == 'jpg':
+            content_type = 'image/jpg'
+        elif extension == 'jpeg':
+            content_type = 'image/jpeg'
+        elif extension == 'pdf':
+            content_type = 'application/pdf'
+
+        print(file_path)
+        #file_path = os.path.join(settings.MEDIA_ROOT, path)
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as fh:
+                response = HttpResponse(fh.read(), content_type=content_type )
+                response['Content-Disposition'] = 'attachment; filename='+os.path.basename(file_path)
+                return response
+
+        raise Http404

@@ -4,7 +4,7 @@
 }
 
 .striped > tbody > tr:nth-child(4n+1) > td, .striped > tbody > tr:nth-child(4n+1) > th {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .accordion-toggle{

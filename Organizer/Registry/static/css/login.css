@@ -68,7 +68,7 @@ input:focus{
 
 @media (max-width:768px){
     .card{
-        width: calc(80vw);
+        width: calc(60vw);
         height: calc(50vh);
     }
 }
