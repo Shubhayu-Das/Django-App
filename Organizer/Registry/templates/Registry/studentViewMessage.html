@@ -2,10 +2,11 @@
 {% load static %}
 
 {% block style %}
-    <link rel="stylesheet" href = {% static "css/studentViewMessage.css" %}>
+    <link rel="stylesheet" href = {% static "css/adminViewMessage.css" %}>
 {% endblock %}
 
 {% block body %}
+<!--
     <div id = "viewAll">
         <a href="{% url 'studentSendMessage' %}" id = "sender">Send message to admin</a>
         <div id = "messageTable">
@@ -27,4 +28,59 @@
             </table>
         </div>
     </div>
+-->
+<div id = 'allMessage'>
+    <p id = 'sender'>   <a href="{% url 'studentSendMessage' %}">Send a message</a> </p>
+
+    <p id = "tags"> Messages received: </p>
+    <table class = "table table-bordered striped" id ="receivedMessages">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Message</th>
+                <th>Sender</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for message in received %}
+            <tr>
+                <td> <a href="#post{{message.id}}" data-toggle="collapse" class="accordion-toggle"> {{ message.brief }} </a> </td>
+                <td>{{ message.dates }}</td> 
+                <td>{{ message.sender }}</td>
+            </tr>
+            <tr>
+            <td colspan="3" id = "post{{message.id}}" class="accordion-body collapse in">
+                    {{ message.posts }}
+            </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br><br><br>
+
+    <p id = "tags">Messages sent:</p>
+    <table class = "table table-bordered striped" id = "sentMessages">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for message in sent %}
+            <tr>
+                <td> <a href="#post{{message.id}}" data-toggle="collapse" class="accordion-toggle"> {{ message.brief }} </a> </td>
+                <td>{{ message.dates }}</td>
+            </tr>
+            <tr>
+                <td colspan="3" id = "post{{message.id}}" class="accordion-body collapse in">
+                    {{ message.posts }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
 {% endblock %}

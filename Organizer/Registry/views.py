@@ -237,16 +237,21 @@ def adminViewMessage(request):
     user.unseen_message_count = 0
     user.save()
     id = 0
+    countRcv = 0
+    countSent = 0
     for message in Message.objects.values():
 
-        if message['sender'] == str(user.username):
-            final['sent'].append({'id': str(id), 'brief': message['message'][:10]+"...", 'posts': message['message'], 'dates': str(message['datePosted'].date())})
-
-        if str(user.username) in (message['allowedUsers']):
-            final['received'].append({'id': str(id), 'brief': message['message'][:10]+"...",  'posts': message['message'], 'dates': str(message['datePosted'].date()), 'sender': str(message['sender'])})
-
-            id += 1
-    
+        if countSent < 3:
+            if message['sender'] == str(user.username):
+                final['sent'].append({'id': str(id), 'brief': message['message'][:10]+"...", 'posts': message['message'], 'dates': str(message['datePosted'].date())})
+                countSent += 1
+        if countRcv < 3:
+           if str(user.username) in (message['allowedUsers']):
+                final['received'].append({'id': str(id), 'brief': message['message'][:10]+"...",  'posts': message['message'], 'dates': str(message['datePosted'].date()), 'sender': str(message['sender'])})
+                countRcv += 1
+        id += 1
+        if countRcv == 4 or countSent == 4:
+                break
     print(final['sent'])
     return render(request, 'Registry/adminViewMessage.html', final)
 
@@ -366,8 +371,8 @@ def studentSendMessage(request):
                 for user in storeData.objects.values():
                     if user['is_superuser'] == True:
                         admin = user
-                        user.unseen_message_count += 1
-                        user.save()
+                        user['unseen_message_count'] += 1
+                        storeData.objects.get(is_superuser = True).save()
                 l = []
                 l.append(admin)
         
@@ -392,25 +397,32 @@ def studentSendMessage(request):
 def studentViewMessage(request):
 
     if checkStatus(request):
-        
-        try:
-            final = {'message': []}
+        try: 
             userId = request.session.get('user_info')
             user = storeData.objects.get(id = userId)
+            print(user.username)
             user.unseen_message_count = 0
             user.save()
-
+            final = {'received': [], 'sent': []}
+            countSent = 0
+            countRcv = 0
+            id = 0
             for message in Message.objects.values():
-
-                if str(user.username) in (message['allowedUsers']):
-                    final['message'].append({'posts': message['message'], 'dates': str(message['datePosted'].date()) })
-            
+                if countSent < 3:
+                    if message['sender'] == str(user.username):
+                        final['sent'].append({'id': str(id), 'brief': message['message'][:10]+"...", 'posts': message['message'], 'dates': str(message['datePosted'].date())})
+                        countSent = countSent + 1
+                if countRcv < 3:
+                    if str(user.username) in (message['allowedUsers']):
+                        final['received'].append({'id': str(id), 'brief': message['message'][:10]+"...",  'posts': message['message'], 'dates': str(message['datePosted'].date()), 'sender': str(message['sender'])}) 
+                        countRcv += 1
+                    id += 1
+                if countRcv == 4 or countSent == 4:
+                    break
             return render(request, 'Registry/studentViewMessage.html', final)
-        
         except:
             errorMessage(request, 'notSignedIn')
             return redirect('home')
-    
     errorMessage(request,  'notSignedIn')
     return redirect('home')
 
