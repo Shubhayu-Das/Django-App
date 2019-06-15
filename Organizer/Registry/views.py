@@ -6,7 +6,13 @@ from django.contrib import messages
 from django.shortcuts import render, HttpResponseRedirect, redirect
 from django.conf import settings
 from django.http import HttpResponse, Http404
+from datetime import datetime, timedelta
+import datetime
+from django.utils import timezone
 
+import pytz 
+  
+ 
 
 # The base home page which leads to login/sign up pages
 def home(request):          
@@ -240,22 +246,34 @@ def adminViewMessage(request):
     user.unseen_message_count = 0
     user.save()
     id = 0
-    countRcv = 0
-    countSent = 0
-    for message in Message.objects.values():
 
-        if countSent < 3:
-            if message['sender'] == str(user.username):
-                final['sent'].append({'id': str(id), 'brief': message['message'][:10]+"...", 'posts': message['message'], 'dates': str(message['datePosted'].date())})
-                countSent += 1
-        if countRcv < 3:
-           if str(user.username) in (message['allowedUsers']):
-                final['received'].append({'id': str(id), 'brief': message['message'][:10]+"...",  'posts': message['message'], 'dates': str(message['datePosted'].date()), 'sender': str(message['sender'])})
-                countRcv += 1
+    
+    now = datetime.datetime.now()
+    print("current time is")
+    print(now)
+    # using now() to get current time 
+    current_time = datetime.datetime.now(pytz.timezone('Asia/Calcutta'))
+    print("Using new function ", current_time)
+    threshold = now - datetime.timedelta(hours = 1)
+    new_message = []
+    print("THreshold")
+    print(threshold)
+    new_message = Message.objects.filter(datePosted__range=(threshold, now))
+    old_message = []
+    old_message = Message.objects.filter(datePosted__range = (now - datetime.timedelta(hours = 1), now - datetime.timedelta(hours = 20)))
+    deleteOldMessage(old_message)
+    print("timezone "),
+    print(timezone.localtime())
+    for message in new_message:
+
+        if message.sender == str(user.username):
+            final['sent'].append({'id': str(id), 'brief': message.message[:10]+"...", 'posts': message.message, 'dates': str(message.datePosted.date())})
+
+
+        if str(user.username) in (message.allowedUsers):
+            final['received'].append({'id': str(id), 'brief': message.message[:10]+"...",  'posts': message.message, 'dates': str(message.datePosted.date()), 'sender': str(message.sender)})
+        print(message.sender)
         id += 1
-        if countRcv == 4 or countSent == 4:
-            break
-
     return render(request, 'Registry/adminViewMessage.html', final)
 
 
@@ -499,7 +517,6 @@ def authenticate(request, username = None, password = None):
 
     return "None"
 
-
 # Log out the user on button click
 def logout(request):
     userId = request.session.get('user_info')
@@ -530,8 +547,9 @@ def sendMessage(request, message, recipients):
 
     userId = request.session.get('user_info')
     sender = storeData.objects.get(id = userId)
-    message = Message(message = message, allowedUsers = repr(receivers), sender = sender.username)
-    
+    current_time = timezone.localtime()
+    print("Current time is", current_time)
+    message = Message(message = message, allowedUsers = repr(receivers), sender = sender.username, datePosted = datetime.datetime.now(pytz.timezone('Asia/Calcutta')))
     message.save()
 
 def upload(recipients):
@@ -570,6 +588,7 @@ def errorMessage(request, errorCode = None):
         messages.info(request, 'Please enter the correct password')
 
 def download(ids):
+
     for id in ids:
         file_name = FileUpload.objects.get(id = id).uploadedFile.url
         file_path = settings.MEDIA_ROOT + file_name
@@ -594,3 +613,8 @@ def download(ids):
                 return response
 
         raise Http404
+
+def deleteOldMessage(messages):
+    for message in messages:
+        print(message.message)
+        message.delete()
