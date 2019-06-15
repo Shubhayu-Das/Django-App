@@ -29,8 +29,8 @@
 
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
-                {% if messagesUnseen > 0 or filesUnseen > 0 %}
-                    <span class = "badge badge-danger">{{ messagesUnseen }}</span>
+                {% if total > 0 %}
+                    <span class = "badge badge-danger">{{ total }}</span>
                 {% endif %}
             </button>
 

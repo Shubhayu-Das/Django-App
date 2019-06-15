@@ -105,7 +105,8 @@ def loginStudentHome(request):
             userData['feesStatus'] = user.last_fees_paid.date()
             userData['messagesUnseen'] = user.unseen_message_count
             userData['filesUnseen'] = user.unseen_file_count
-
+            userData['total'] = user.unseen_file_count + user.unseen_message_count
+            
             return render(request, 'Registry/studentBase.html', userData)
         except:
             errorMessage(request, "notSignedIn")
