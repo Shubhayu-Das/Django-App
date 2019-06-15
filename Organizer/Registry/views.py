@@ -6,17 +6,27 @@ from django.contrib import messages
 from django.shortcuts import render, HttpResponseRedirect, redirect
 from django.conf import settings
 from django.http import HttpResponse, Http404
-from datetime import datetime, timedelta
-import datetime
+from datetime import datetime, timedelta, time
 from django.utils import timezone
 
 import pytz 
   
  
-
 # The base home page which leads to login/sign up pages
 def home(request):          
-    return render(request, 'home.html')
+    if checkStatus(request):
+        userId = request.session.get('user_info')
+        user = storeData.objects.get(id=userId)
+
+        if user.is_logged_in:
+            if user.is_superuser:
+                return redirect('adminhome')
+            else:
+                return redirect('studenthome')
+        else:
+            return render(request, 'home.html')
+    else:
+        return render(request, 'home.html')
 
 
 # The page to log in. Handles superusers(admins) and normal users(students) separately
@@ -192,7 +202,7 @@ def fees(request):
             for user in storeData.objects.values():
                 if request.POST.get(str(user['id'])):
                     User = storeData.objects.get(id = str(user['id']))
-                    User.last_fees_paid = datetime.now()
+                    User.last_fees_paid = getTime()
                     User.save()
                     
             return redirect('fees')
@@ -247,23 +257,18 @@ def adminViewMessage(request):
     user.save()
     id = 0
 
-    
-    now = datetime.datetime.now()
-    print("current time is")
-    print(now)
-    # using now() to get current time 
-    current_time = datetime.datetime.now(pytz.timezone('Asia/Calcutta'))
-    print("Using new function ", current_time)
-    threshold = now - datetime.timedelta(hours = 1)
+    currentTime = getTime()     #Is 5 hours and 30 minutes ahead of datetime.now()
+   
+    displayThreshold = currentTime - timedelta(weeks = 1)
     new_message = []
-    print("THreshold")
-    print(threshold)
-    new_message = Message.objects.filter(datePosted__range=(threshold, now))
+    new_message = Message.objects.filter(datePosted__gte= displayThreshold)
+
+    deleteThreshold = currentTime - timedelta(weeks = 3)
     old_message = []
-    old_message = Message.objects.filter(datePosted__range = (now - datetime.timedelta(hours = 1), now - datetime.timedelta(hours = 20)))
+    old_message = Message.objects.filter(datePosted__lte = deleteThreshold)
+
     deleteOldMessage(old_message)
-    print("timezone "),
-    print(timezone.localtime())
+    
     for message in new_message:
 
         if message.sender == str(user.username):
@@ -272,7 +277,6 @@ def adminViewMessage(request):
 
         if str(user.username) in (message.allowedUsers):
             final['received'].append({'id': str(id), 'brief': message.message[:10]+"...",  'posts': message.message, 'dates': str(message.datePosted.date()), 'sender': str(message.sender)})
-        print(message.sender)
         id += 1
     return render(request, 'Registry/adminViewMessage.html', final)
 
@@ -492,6 +496,9 @@ def downloadFile(request):
 '''
 
 # Function to verify if the password is correct or wrong. Further checks for superuser access
+def getTime():
+    return datetime.now(tz=pytz.timezone('Asia/Kolkata'))+timedelta(hours=5, minutes=30)
+    
 def authenticate(request, username = None, password = None):
     
     try:
@@ -527,13 +534,29 @@ def logout(request):
     request.session['user_info'] = -1
     return redirect('home')
 
+
 # Function to update the attendance of the students
 def markPresent(present):
+    print(getTime())
     for id in present:
         person = storeData.objects.get(id = id)
-        person.last_class_attended = datetime.now()
+        person.last_class_attended = getTime()
         person.no_of_class_attended += 1
         person.save()
+
+   
+    last_month = person.last_class_attended.strftime("%m")
+    if last_month != storeData.objects.get(is_superuser = 1).last_class_attended.strftime("%m"):
+        for user in storeData.objects.all():
+            if user.is_superuser:
+                user.last_class_attended = getTime()
+            elif user.id in present:
+                user.no_of_class_attended = 1
+            else:
+                user.no_of_class_attended = 0
+            
+            user.save()
+
 
 # Save a Message entry from both students and the admin(s)
 def sendMessage(request, message, recipients):
@@ -547,9 +570,8 @@ def sendMessage(request, message, recipients):
 
     userId = request.session.get('user_info')
     sender = storeData.objects.get(id = userId)
-    current_time = timezone.localtime()
-    print("Current time is", current_time)
-    message = Message(message = message, allowedUsers = repr(receivers), sender = sender.username, datePosted = datetime.datetime.now(pytz.timezone('Asia/Calcutta')))
+
+    message = Message(message = message, allowedUsers = repr(receivers), sender = sender.username, datePosted = getTime())
     message.save()
 
 def upload(recipients):

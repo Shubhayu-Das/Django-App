@@ -6,23 +6,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="apple-touch-icon" sizes="180x180" href={% static "favicon_io/apple-touch-icon.png" %}>
+    <link rel="icon" type="image/png" sizes="32x32" href={% static "favicon_io/favicon-32x32.png" %}>
+    <link rel="icon" type="image/png" sizes="16x16" href={% static "favicon_io/favicon-16x16.png" %}>
+    <link rel="manifest" href={% static "favicon_io/site.webmanifest" %}>
     <title>Home</title>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
     <link rel="stylesheet" href = {% static "css/home.css" %}>
 </head>
+<script>
+    window.onload = () => {
+        let login = document.getElementById('login');
+        let signup = document.getElementById('signup');
+        
+        signup.style.opacity = 1;
+        signup.style.marginLeft = 0;
+
+        login.style.opacity = 1;
+        login.style.marginLeft = 0;
+    };
+</script>
 <body>
    
-    <div class = "container-fluid">
-        <img src="{% static 'images/background.png' %}" alt="File not found!" id = "wallpaper" />
-        <div class = "row align-items-center justify-self-center">
-            <div class="col-12 col-sm-6">
-                <div class="text-center text-light options">
-                    <a href="{% url 'login' %}">Log in</a>
-                    <a href="{% url 'signup' %}">Sign Up</a>
-                </div>
-            </div>
+    <div class = "container-fluid p-0">
+        <img class="col-12 p-0" src="{% static 'images/background.png' %}" alt="File not found!" id = "wallpaper" />
+        <div class = "d-flex flex-column justify-content-center options">
+            <a class="text-decoration-none text-center text-light links" id = "login" href="{% url 'login' %}">Log in</a>
+            <a class="text-decoration-none text-light text-center links" id = "signup" href="{% url 'signup' %}">Sign Up</a>
         </div>
         {% if messages %}
             <ul class="messages">
