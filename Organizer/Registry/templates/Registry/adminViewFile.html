@@ -1,0 +1,38 @@
+{% extends "Registry/adminBase.html" %}
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href = {% static "css/adminViewFile.css" %}>
+{% endblock %}
+
+{% block body %}
+    <div id = 'allFiles'>
+        <h3 id = 'sender'> <a href="{% url 'adminUploadFile' %}">Send a file</a> </h3>
+        <p id = "tags">Files Uploaded:</p>
+
+        <form method="POST" target="_blank">
+            {% csrf_token %}
+            <div id = "encloseTable" class = "justify-content-center">
+            <table class = "table table-responsive align-items-center">
+                <thead>
+                    <tr>
+                        <th class="mr-auto">File name</th>
+                        <th>Date</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for File in Files %}
+                    <tr>
+                        <td class="mr-auto"> <label for="File.id">{{File.name}}</label> </td>
+                        <td>{{File.date}}</td>
+                        <td> <input type="radio" class = "check" id = "{{File.id}}" name = "{{File.id}}"> </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+            <input type="submit" value="Download" class="btn login-btn btn-warning offset-8 offset-sm-5 mr-auto">
+        </form>
+    </div>
+{% endblock %}

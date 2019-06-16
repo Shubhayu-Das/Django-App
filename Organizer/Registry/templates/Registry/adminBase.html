@@ -55,7 +55,7 @@
                         </a>
                     </li>
                     <li class = "navbar-nav mr-auto">
-                        <a href = "{% url 'uploadFile' %}" class = "nav-link">Materials</a>
+                        <a href = "{% url 'adminViewFile' %}" class = "nav-link">Materials</a>
                     </li>
                     {% if requiresValidation %}
                     <li class = "navbar-nav mr-auto">
@@ -82,8 +82,15 @@
 
     <footer class="footer mr-auto">
         <div class="container-fluid">
-            <div class = "p-2 d-flex align-items-center flex-column bg-dark">
-                <div class = "p-2" id = "contactLinks">Contact links</div>
+            <div class = "p-1 d-flex align-items-center flex-column bg-dark">
+                <div class = "p-1" id = "contactLinks">
+                    <a href='https://m.facebook.com/login.php?next=https%3A%2F%2Fm.facebook.com%2Fhome.php&refsrc=https%3A%2F%2Fm.facebook.com%2Fhome.php&_rdr' class="darkness mr-2">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a href='https://www.google.com/'  class="darkness mr-2">
+                        <i class="fab fa-google"></i>
+                    </a>
+                </div>
                 <div id = "contributors">Developed by Karthik Udupa and Shubhayu Das</div>
             </div>
         </div>

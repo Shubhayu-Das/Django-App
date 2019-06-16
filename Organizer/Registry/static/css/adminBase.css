@@ -50,6 +50,11 @@ html, body{
     padding-bottom: 50%;
 }
 
+.darkness{
+    text-decoration: none;
+    color: white;
+}
+
 @media (min-width: 768px){
     #title{
         padding-left: calc(1vw);

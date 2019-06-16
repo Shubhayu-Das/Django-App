@@ -1,0 +1,34 @@
+#allFiles{
+    min-height: calc(80vh);
+    max-width: calc(60vw);
+    margin: auto;
+}
+
+#encloseTable{
+    width: max-content;
+    margin: auto;
+}
+#sender{
+    margin: auto;
+    padding: 20px;
+    font-size: calc(4vh);
+    padding-left: 0%;
+}
+
+#tags{
+    margin: auto;
+    font-size: calc(3vh);
+    padding-top: calc(3vh);
+    padding-bottom: calc(2vh);
+}
+
+@media (max-width: 768px){
+    
+    #allFiles{
+        max-width: calc(80vw);
+    }
+
+    #encloseTable{
+        width: auto;
+    }
+}

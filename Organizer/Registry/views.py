@@ -329,8 +329,34 @@ def adminSendMessage(request):
     return render(request, 'Registry/adminSendMessage.html', args)
 
 
+def adminViewFile(request):
+
+    args = {'Files': []}
+    userId = request.session.get('user_info')
+    user = storeData.objects.get(id = userId)
+    if checkStatus(request):
+        if request.method == 'POST':
+            form = FileDownloadForm(request.POST)
+
+            if form.is_valid():
+                lst = []
+                for File in FileUpload.objects.values():
+                    if request.POST.get(str(File['id'])):
+                        lst.append(File['id'])
+                return download(lst)
+        else:
+            for File in FileUpload.objects.values():
+                args["Files"].append({"id": File["id"], "name": os.path.basename(FileUpload.objects.get(id = File['id']).uploadedFile.path), "date": str(File['upload_time'].date())})
+
+            return render(request, 'Registry/adminViewFile.html', args)
+    
+    else:
+        errorMessage(request,  'notSignedIn')
+        return redirect('home')
+
+
 # Function to upload files to the system
-def uploadFile(request):
+def adminUploadFile(request):
     
     args = {}
 
@@ -364,7 +390,7 @@ def uploadFile(request):
             
             return redirect('adminhome')
         else:
-            return redirect('uploadFile')
+            return redirect('adminUploadFile')
     else:
         form = FileUploadForm()
         LIST_OF_CHOICES = []
@@ -375,7 +401,7 @@ def uploadFile(request):
 
         args = {"form": form, "students": LIST_OF_CHOICES}
         print("Here")
-        return render(request, 'Registry/uploadFile.html', args)
+        return render(request, 'Registry/adminUploadFile.html', args)
 
 # Function for the student to send message to the teacher/superusers
 def studentSendMessage(request):

@@ -41,4 +41,4 @@ class FeesPaid(forms.Form):
 
 class FileDownloadForm(forms.Form):
     model = FileUpload
-    choices = forms.ChoiceField(required = False)
+    choices = forms.ChoiceField(widget=forms.RadioSelect(), required = False)
