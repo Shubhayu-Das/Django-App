@@ -30,6 +30,12 @@ ALLOWED_HOSTS = ['192.168.0.106', '192.168.43.116', '192.168.42.150']     #Secon
 
 # Application definition
 
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'Vidya.carnatic.music'
+EMAIL_HOST_PASSWORD = 'skmusic123!'
+EMAIL_USE_TLS = True
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

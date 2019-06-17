@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, time
 from django.utils import timezone
 
 import pytz 
-  
+from django.core.mail import send_mail
  
 # The base home page which leads to login/sign up pages
 def home(request):          
@@ -47,7 +47,6 @@ def login(request):
 
             elif response == "No":
                 user = storeData.objects.get(username = username)
-                messages.info(request, str(user.id))
                 request.session['user_info'] = user.id
                 return redirect('/student-home/')
 
@@ -74,15 +73,22 @@ def register(request):
             password = request.POST.get('password')
             phone = request.POST.get('phone_number')
             Batch = request.POST.get('Batch')
-            try:
-                user = storeData.objects.get(username = username, phone_number = phone)
-                errorMessage(request, 'accountExists')                
-            
-            except:
-                newUser = storeData(username = username, password = password, phone_number = phone, batch_number = Batch)
-                newUser.save()
-                messages.info(request, 'Your registration is complete. Please wait for the administrator to validate your account')
-            
+            confirm_password = request.POST.get('confirm_password')
+            email_address = request.POST.get('email_address')
+            if password == confirm_password:
+                try:
+                    user = storeData.objects.get(username = username, phone_number = phone)
+                    errorMessage(request, 'accountExists')
+                    return HttpResponseRedirect('/')                
+                
+                except:
+                    newUser = storeData(username = username, password = password, phone_number = phone, batch_number = Batch, email_address = email_address)
+                    newUser.save()
+                    messages.info(request, 'Your registration is complete. Please wait for the administrator to validate your account')
+                    return HttpResponseRedirect('/')
+                
+            else:
+                messages.info(request, "Password confirmation incorrect")
                 return HttpResponseRedirect('/')
     
     else:
@@ -666,3 +672,25 @@ def deleteOldMessage(messages):
     for message in messages:
         print(message.message)
         message.delete()
+    
+def recoverPassword(request):
+    if request.method == 'POST':
+        form = phoneNumber(request.POST)
+        phone_number = request.POST.get('phone_number')
+        try:
+            user = storeData.objects.get(phone_number = phone_number)
+            sendMail(user)
+            messages.info(request, 'Details sent to your accout mail')
+            return render(request, 'home.html')
+        except:
+            messages.info('This phone number is not present. Check out with other phone numbers that you may have used')
+    else:
+        form = phone_number()
+    return render(request, 'Registry/recover.html', {'form': form})
+
+def sendMail(user):
+    subject = str(user.username) + " details."
+    body = "User password : " + str(user.password)
+    sender = 'Vidya.carnatic.music@gmail.com'
+    receiver = user.email_address
+    send_mail(subject, body, sender, [receiver, ])

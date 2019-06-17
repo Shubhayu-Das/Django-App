@@ -18,5 +18,6 @@ urlpatterns = [
         path('admin-home/admin-upload-files/', views.adminUploadFile, name = 'adminUploadFile'),
         path('student-home/student-message/send/',  views.studentSendMessage, name = 'studentSendMessage'),
         path('student-home/student-download-files/', views.downloadFile, name = 'downloadFile'),
+        path('recover/', views.recoverPassword, name = 'recoverPassword'),
         path('logout/', views.logout, name="logout"),
 ]

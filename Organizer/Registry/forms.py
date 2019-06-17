@@ -13,6 +13,7 @@ class SelectStudentForm(forms.Form):
 class RegistrationForm(forms.ModelForm):
     username = forms.CharField()
     password = forms.CharField(widget = forms.PasswordInput)
+    confirm_password = forms.CharField(widget = forms.PasswordInput)
     phone_number = forms.CharField()
     CHOICE = (('1', 'First',), ('2', 'Second',))
     Batch = forms.ChoiceField(widget = forms.RadioSelect, choices = CHOICE)
@@ -42,3 +43,8 @@ class FeesPaid(forms.Form):
 class FileDownloadForm(forms.Form):
     model = FileUpload
     choices = forms.ChoiceField(widget=forms.RadioSelect(), required = False)
+
+class phoneNumber(forms.Form):
+    phone_number = forms.CharField()
+    class Meta:
+        model = storeData

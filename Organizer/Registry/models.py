@@ -24,7 +24,7 @@ class storeData(models.Model):
     is_logged_in = models.BooleanField(default = False, verbose_name = "Logged in status")
     unseen_message_count = models.IntegerField(default = 0)
     unseen_file_count = models.IntegerField(default = 0)
-
+    email_address = models.EmailField()
 class Message(models.Model):
 
     message = models.CharField(max_length = 3000, verbose_name = "Message: ")
