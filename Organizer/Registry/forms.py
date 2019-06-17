@@ -3,7 +3,7 @@ from .models import storeData, FileUpload
 
 class LoginForm(forms.Form):
     model = storeData
-    username = forms.CharField(max_length = 100,)
+    phone_number = forms.CharField(max_length = 100,)
     password = forms.CharField(widget = forms.PasswordInput,)
 
 class SelectStudentForm(forms.Form):

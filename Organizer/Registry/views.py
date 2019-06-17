@@ -35,18 +35,18 @@ def login(request):
         form = LoginForm(request.POST)
         
         if form.is_valid():
-            username = request.POST.get('username')
+            phone_number = request.POST.get('phone_number')
             password = request.POST.get('password')
 
-            response = authenticate(request, username=username, password=password)
+            response = authenticate(request, phone_number=phone_number, password=password)
 
             if response == 'Yes':         
-                user = storeData.objects.get(username = username)
+                user = storeData.objects.get(phone_number = phone_number)
                 request.session['user_info'] = user.id
                 return redirect('/admin-home/')
 
             elif response == "No":
-                user = storeData.objects.get(username = username)
+                user = storeData.objects.get(phone_number = phone_number)
                 request.session['user_info'] = user.id
                 return redirect('/student-home/')
 
@@ -531,12 +531,13 @@ def downloadFile(request):
 def getTime():
     return datetime.now(tz=pytz.timezone('Asia/Kolkata'))+timedelta(hours=5, minutes=30)
     
-def authenticate(request, username = None, password = None):
+def authenticate(request, phone_number = None, password = None):
     
     try:
-        user = storeData.objects.get(username = username)
+        user = storeData.objects.get(phone_number = phone_number)
     except:
-        messages.info(request, "Enter valid username")
+        print(phone_number)
+        messages.info(request, "Phone number invalid. Please try with registered phone number.")
         return "None"
     if password == user.password:
         user.is_logged_in = True
