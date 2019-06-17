@@ -12,7 +12,7 @@ html, body{
 }
 
 .card{
-    height: calc(50vh);
+    height: auto;
     width: calc(25vw);
     margin-top: auto;
     margin-bottom: auto;
@@ -21,6 +21,10 @@ html, body{
 
 .card-header h3{
     color: white;
+}
+
+.input-group-prepend{
+    background-color: #FFC312;
 }
 
 .input-group-prepend span{
@@ -39,12 +43,23 @@ input:focus{
     color: black;
     background-color: #FFC312;
     width: 100px;
-    margin-top: calc(3vh);
 }
 
 .login_btn:hover{
     color: black;
     background-color: white;
+}
+
+.radio{
+    height: 25px;
+    margin-top: calc(0.8vh);
+}
+
+.labels{
+    font-size: 1.3rem;
+    width: auto;
+    height: min-content;
+    color: white;
 }
 
 .links{
@@ -55,10 +70,27 @@ input:focus{
     margin-left: 4px;
 }
 
+.footerInfo{
+    color: white;
+    font-size: 1.1rem;
+}
+
 @media (max-width:768px){
     .card{
         width: calc(80vw);
-        height: calc(65vh);
+    }
+
+    .input-group-prepend{
+        width: 40px;
+        border-radius: 40% 0% 0% 40%;
+    }
+    .input-group-prepend span{
+        width: calc(2vw);
+    }
+
+    .radio{
+        height: 20px;
+        margin-top: calc(0.5vh);
     }
 }
 
@@ -66,5 +98,18 @@ input:focus{
     
     .card{
         width: calc(60vw);
+    }
+
+    .radio{
+        height: 20px;
+        margin-top: calc(0.5vh);
+    }
+
+    .input-group-prepend{
+        width: 40px;
+        border-radius: 40% 0% 0% 40%;
+    }
+    .input-group-prepend span{
+        width: calc(2vw);
     }
 }

@@ -23,11 +23,11 @@
     max-width: 60%;
     margin: auto;
     padding: 20px;
-    font-size: calc(3vh);
     padding-left: 0%;
 }
 
 #sender a{
+    font-size: 2rem;
     text-decoration: none;
 }
 

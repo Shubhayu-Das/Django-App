@@ -72,12 +72,12 @@
         <p class="card-text"  align = "center">Last fees paid on: {{ feesStatus }}</p>
    
             {% if messages %}
-                <ul class="messages">
-            {% for message in messages %}
-            <p class="card-text" align = "center">
-                <li>{{ message }}</li>
-            </p>
-            {% endfor %}
+                <ul class="messages" style="list-style: none"> 
+                    {% for message in messages %}
+                        <p class="card-text" align = "center">
+                            <li>{{ message }}</li>
+                        </p>
+                    {% endfor %}
                 </ul>
             {% endif %}
         </div>

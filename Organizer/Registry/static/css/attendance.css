@@ -1,33 +1,34 @@
+th, td{
+    text-align: center;
+}
+
 #attendanceAll{
     width: 90%;
     height: 100%;
     margin: auto;
+    padding-top: calc(5vh);
+}
+
+#niceness{
+    font-size: 1.5rem;
 }
 
 #guides{
-    padding-top: calc(5vh); 
-    padding-bottom: calc(3vh);
-    padding-left: 0%;
-    font-size: calc(2.8vh);
     list-style: none;
     display: flex;
     flex-direction: row;
-    margin: auto;
     justify-content: space-evenly;
+    padding-left: 0%;
+}
+
+#guides a{
+    font-size: 2rem;
+    text-decoration: none;
 }
 
 #batch1, #batch2{
     text-align: center;
     font-size: calc(2.5vh);
-}
-
-
-#guides li{
-    width: max-content;
-}
-
-#guides a{
-    text-decoration: none;
 }
 
 #formTable{
@@ -39,15 +40,19 @@
     position: relative;
 }
 
-form{
-    width: 100%;
-    height: 100;
+#ease{
+    visibility: visible;
 }
+
 @media (min-width: 768px){
     br{
         display: none;
     }
     #attendanceAll{
         width: 60%;
+    }
+
+    #ease{
+        visibility: hidden;
     }
 }

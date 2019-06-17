@@ -9,13 +9,14 @@
     <div id = "allFiles">
         <form method="POST" target="_blank">
             {% csrf_token %}
-            <div id = "encloseTable" class = "col-12 col-sm-10 col-md-6 offset-sm-1 offset-md-3 align-items-center justify-content-center">
-            <table class = "table table-responsive align-items-center">
+            <p id="tags">Files available:</p>
+            {% if Files %}
+            <table class = "table table-responsive table-striped table-bordered">
                 <thead>
                     <tr>
                         <th class="mr-auto">File name</th>
                         <th>Date</th>
-                        <th></th>
+                        <th>Select</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -28,8 +29,10 @@
                     {% endfor %}
                 </tbody>
             </table>
-            </div>
-            <input type="submit" value="Download" class="btn login-btn btn-warning offset-8 offset-sm-5 mr-auto">
+            <input type="submit" value="Download" class="btn btn-warning float-right">
         </form>
+        {% else %}
+            <p id="niceness">No files uploaded at the moment!</p>
+        {% endif %}
     </div>
 {% endblock %}

@@ -17,6 +17,7 @@ body{
     padding: 0%;
 }
 
+
 .links{
     font-size: 4rem;
 }
@@ -55,4 +56,10 @@ body{
     .links{
         font-size: 2rem;
     }
+
+    .modal-dialog{
+        transition: none;
+        width: calc(90vw);
+    }
+    
 }

@@ -23,6 +23,12 @@ html, body{
     color: white;
 }
 
+.input-group-prepend{
+    width: 40px;
+    background-color: #FFC312;
+    border-radius: 40% 0% 0% 40%;
+}
+
 .input-group-prepend span{
     width: calc(2vw);
     background-color: #FFC312;
@@ -68,14 +74,15 @@ input:focus{
 
 @media (max-width:768px){
     .card{
-        width: calc(60vw);
-        height: calc(50vh);
+        width: calc(70vw);
+        height: calc(45vh);
     }
 }
 
 @media (min-width: 769px) and (max-width: 1024px){
     
     .card{
-        width: calc(60vw);
+        width: calc(70vw);
+        height: calc(35vh);
     }
 }

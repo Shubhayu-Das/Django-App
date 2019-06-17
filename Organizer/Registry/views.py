@@ -107,7 +107,7 @@ def loginAdminHome(request):
             appearance = True
 
     user = storeData.objects.get(id = request.session.get('user_info'))
-    args = {'requiresValidation': appearance, 'messagesUnseen': user.unseen_message_count}
+    args = {'requiresValidation': appearance, 'messagesUnseen': user.unseen_message_count, 'total':user.unseen_message_count+user.unseen_file_count}
     return render(request, 'Registry/adminBase.html', args)
 
 
@@ -352,7 +352,7 @@ def adminViewFile(request):
                 return download(lst)
         else:
             for File in FileUpload.objects.values():
-                args["Files"].append({"id": File["id"], "name": os.path.basename(FileUpload.objects.get(id = File['id']).uploadedFile.path), "date": str(File['upload_time'].date())})
+                args["Files"].append({"id": File["id"], "name": os.path.basename(FileUpload.objects.get(id = File['id']).uploadedFile.path), "date": str(File['upload_time'].date()), 'description': File['description']})
 
             return render(request, 'Registry/adminViewFile.html', args)
     

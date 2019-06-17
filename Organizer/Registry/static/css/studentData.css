@@ -1,6 +1,6 @@
 #full{
     position: relative;
-    padding-top: 5%;
+    padding-top: calc(5vh);
     width: max-content;
 }
 
@@ -10,6 +10,10 @@
 
 .table th{
     text-align: center;
+}
+
+#niceness{
+    font-size: 1.2rem;
 }
 
 #guides{
@@ -22,6 +26,11 @@
 
 #guides a{
     text-decoration: none;
+    font-size: 2rem;
+}
+
+#batch1, #batch2 {
+    font-size: 2rem;
 }
 
 @media (min-width: 768px){

@@ -7,8 +7,9 @@
 
 {% block body %}
     <div id = 'allMessage'>
-        <a href="{% url 'adminViewMessage' %}"><- back</a>
-    
+        <a class="back" href="{% url 'adminViewMessage' %}"><i class="fas fa-arrow-left"></i> back</a>
+        <a id = "ease" href="#send-message" class="float-right" style="text-align: center; color: black"> Send <br> <i class="fas fa-arrow-down"></i></a>
+
         <form method="POST" id = "form">
             {% csrf_token %}
             <div class = "form-group" id = "messageBox">
@@ -40,12 +41,9 @@
                         </tbody>
                     </table>
                 </div>
-                <input type="submit" value="Post" class="btn login-btn btn-warning float-right">
+                <input type="submit" id="send-message" value="Send" class="btn login-btn btn-warning float-right">
 
             </div>
         </form>
-    {% if message %}
-    {{ message }}
-    {% endif %}
 </div>
 {% endblock %}

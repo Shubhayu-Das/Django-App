@@ -1,25 +1,43 @@
+th, td{
+    text-align: center;
+    width: calc(20vw);
+}
 #allFiles{
     min-height: calc(80vh);
     max-width: calc(60vw);
+    padding-top: calc(5vh);
     margin: auto;
 }
 
-#encloseTable{
-    width: max-content;
+.table{
+    width: 100%;
     margin: auto;
 }
+
 #sender{
     margin: auto;
-    padding: 20px;
     font-size: calc(4vh);
-    padding-left: 0%;
+    padding-bottom: calc(3vh); 
+    text-decoration: none;
 }
 
 #tags{
     margin: auto;
     font-size: calc(3vh);
-    padding-top: calc(3vh);
     padding-bottom: calc(2vh);
+}
+
+#info-tag{
+    font-size: 2.5rem;
+    text-align: center
+}
+
+#download{
+    margin-top: calc(3vh);
+}
+
+.fa-arrow-right{
+    font-size: 28px;
 }
 
 @media (max-width: 768px){
@@ -30,5 +48,9 @@
 
     #encloseTable{
         width: auto;
+    }
+
+    th, td{
+        width: calc(26.4vw);
     }
 }

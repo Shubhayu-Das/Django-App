@@ -1,7 +1,26 @@
-#allFiles{
-    min-height: calc(80vh);
+th, td{
+    text-align: center;
+    width: calc(25vw);
 }
 
-#encloseTable{
-    padding-top: calc(10vh);
+#allFiles{
+    min-height: calc(80vh);
+    width: calc(60vw);
+    margin:auto;
+    padding-top: calc(5vh);
+}
+
+#tags{
+    font-size: 2rem;
+}
+
+#niceness{
+    font-size: 2.1rem;
+    text-align: center;
+}
+
+@media (max-height: 768px){
+    #allFiles{
+        width: calc(90vw);
+    }
 }

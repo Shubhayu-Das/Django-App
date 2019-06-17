@@ -21,7 +21,7 @@ html, body{
     border: 0ch;
     margin: 0%;
     max-width: 100%;
-    min-height: calc(80vh);
+    min-height: calc(70vh);
     overflow: auto;
 }
 
@@ -50,9 +50,9 @@ html, body{
     padding-bottom: 50%;
 }
 
-.darkness{
-    text-decoration: none;
+.fa-sign-out-alt{
     color: white;
+    padding-left: calc(0.5vw);
 }
 
 @media (min-width: 768px){
@@ -69,5 +69,18 @@ html, body{
         position: fixed;
         left: 0;
         bottom: 0;
+    }
+    .float-right{
+        margin-right: calc(2vw);
+    }
+}
+
+@media (max-width: 768px){
+    #body{
+        min-height: calc(80vh);
+    }
+    .modal-dialog{
+        transition: none;
+        width: calc(90vw);
     }
 }

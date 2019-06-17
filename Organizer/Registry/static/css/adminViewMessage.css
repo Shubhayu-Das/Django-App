@@ -9,10 +9,15 @@
 
 .accordion-toggle{
     text-decoration: none;
- }
+}
+
 #receivedMessages{
     max-width: 60%;
     margin: auto;
+}
+
+.fa-arrow-right{
+    font-size: 28px;
 }
 
 #sentMessages{
@@ -24,13 +29,14 @@
 #sender{
     max-width: 60%;
     margin: auto;
-    padding: 20px;
     font-size: calc(3vh);
-    padding-left: 0%;
+    padding-bottom: calc(3vh);
+    padding-top: calc(5vh);
 }
 
 #sender a{
     text-decoration: none;
+    font-size: 2rem;
 }
 
 .collapse{
@@ -47,7 +53,6 @@ th, td{
     max-width: 60%;
     margin: auto;
     font-size: calc(3vh);
-    padding-top: calc(3vh);
 }
 
 @media (max-width: 768px){

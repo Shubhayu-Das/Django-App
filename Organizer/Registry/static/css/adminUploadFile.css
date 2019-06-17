@@ -1,3 +1,11 @@
+th, td{
+    text-align: center;
+}
+
+.general{
+    font-size: 1.5rem;
+}
+
 #upload{
     position: relative;
     top: calc(3vh);
@@ -5,20 +13,37 @@
     margin: auto;
 }
 
+.fa-arrow-down{
+    position: relative;
+    color: black;
+    text-decoration: none;
+}
+
 #file-message{
-    font-size: calc(3vh);
+    font-size: 2rem;
+    padding-top: calc(3vh);
     padding-bottom: calc(1vh);
 }
 
 #file-chooser{
+    min-width: calc(30vw);
+    height: auto;
+    margin: auto;
     margin-top: calc(3vh);
-    padding-bottom: calc(3vh);
 }
 
-#selectTable{
-    width: 50%;
+#ease{
+    visibility: hidden;
+}
+
+#upload-btn{
+    margin-top: calc(3vh);
+}
+
+.table{
+    width: calc(50vh);
     margin: auto;
-    padding-top: calc(5vh);
+    margin-top: calc(5vh);
 }
 
 @media (max-width: 768px){
@@ -26,7 +51,11 @@
         width: 80%;
     }
 
-    #selectTable{
+    .table{
         width: 100%;
+    }
+
+    #ease{
+        visibility: visible;
     }
 }

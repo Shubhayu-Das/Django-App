@@ -1,3 +1,7 @@
+th, td{
+    text-align: center;
+}
+
 #allMessage{
     width: 60%;
     margin: auto;
@@ -5,7 +9,7 @@
 }
 
 #tag{
-    font-size: calc(3vh);
+    font-size: 3rem;
 }
 
 #selectTable{
@@ -14,11 +18,27 @@
     padding-top: calc(5vh);
 }
 
+.back{
+    font-size: 2rem;
+}
+
+.fa-arrow-left{
+    font-size: 28px;
+}
+
+#ease{
+    visibility: hidden;
+}
+
 @media (max-width: 768px){
     #allMessage{
         width: 80%;
     }
     #selectTable{
         width: 100%;
+    }
+
+    #ease{
+        visibility: visible;
     }
 }
