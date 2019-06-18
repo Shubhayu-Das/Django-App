@@ -63,6 +63,9 @@
                     <li class = "navbar-nav mr-auto">
                         <a href = "{% url 'adminViewFile' %}" class = "nav-link">Materials</a>
                     </li>
+                    <li class = "navbar-nav mr-auto">
+                        <a href = "{% url 'deleteUser' %}" class = "nav-link">Delete</a>
+                    </li>
                     {% if requiresValidation %}
                     <li class = "navbar-nav mr-auto">
                         <a href = "{% url 'validateStudent' %}" class = "nav-link">Validate</a>

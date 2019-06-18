@@ -348,6 +348,7 @@ def adminViewFile(request):
                 lst = []
                 for File in FileUpload.objects.values():
                     if request.POST.get(str(File['id'])):
+                        print("inside if condition")
                         lst.append(File['id'])
                 return download(lst)
         else:
@@ -695,3 +696,29 @@ def sendMail(user):
     sender = 'Vidya.carnatic.music@gmail.com'
     receiver = user.email_address
     send_mail(subject, body, sender, [receiver, ])
+
+def deleteUser(request):
+    if request.method == 'POST':
+        form = delete_form(request.POST)
+        selected_users = []
+        for user in storeData.objects.values():
+                if request.POST.get(str(user['id'])):
+                    student = storeData.objects.get(username = user['username'])
+                    print(student.username)
+                    student.delete()
+        messages.info(request, 'Selected users deleted.')
+        return HttpResponseRedirect('/admin-home/')
+    else:
+        LIST_OF_CHOICES_1 = []
+        LIST_OF_CHOICES_2 = []
+        for user in storeData.objects.values():
+            if not user['is_superuser'] and user['validated']:
+                if user['batch_number'] == 1:
+                    LIST_OF_CHOICES_1.append({'name': user['username'], 'id': user['id']}) 
+                else:
+                    LIST_OF_CHOICES_2.append({'name': user['username'], 'id': user['id']})
+
+        form = delete_form()
+        args = {'form': form ,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
+
+        return render(request, 'Registry/deleteUser.html', args)

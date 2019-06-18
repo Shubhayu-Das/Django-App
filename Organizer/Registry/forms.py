@@ -48,3 +48,6 @@ class phoneNumber(forms.Form):
     phone_number = forms.CharField()
     class Meta:
         model = storeData
+
+class delete_form(forms.Form):
+    choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
