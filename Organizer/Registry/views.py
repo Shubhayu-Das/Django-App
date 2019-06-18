@@ -235,10 +235,10 @@ def validateStudent(request):
             for user in storeData.objects.values():
                 response = request.POST.get(str(user['id']))
                 student = storeData.objects.get(id = str(user['id']))
-                if(response == "Validate"): 
+                if(response == "Accept"): 
                     student.validated = True
                     student.save()
-                elif(response == "Discard"):
+                elif(response == "Delete"):
                     student.delete()
             return redirect('home')
         #List of unvalidated users.

@@ -7,29 +7,31 @@
 
 {% block body %}
 <div id="full">
-<form method="POST" id = "form">
-    {% csrf_token %}
-<table style="margin: auto" class = "table table-striped table-bordered table-hover table-responsive">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Batch</th>
-            <th>Accept</th>
-            <th>Delete</th>
-        </tr>
-        </thead>
-        <tbody>
-    {% for user in users %}
-    <tr>
-        <td>{{ user.name }}</td>
-        <td>{{ user.batch }}</td>
-        <td><input type="radio" name = "{{user.id}}" value= "Validate"></td>
-        <td><input type="radio" name = "{{user.id}}" value="Discard"></td>
-    </tr>
-        {% endfor %}
-    </tbody>
-    </table>
-    <input type="submit" value="Post" class="btn login-btn btn-warning float-right"id = "submit">
-</form>
-    </div>
-    {% endblock %}
+    <form method="POST" id = "form">
+        {% csrf_token %}
+        <a id = "ease" href="#update-permissions" class="float-right" style="text-align: center; color: black"> Update <br> <i class="fas fa-arrow-down"></i></a>
+        <p id = "tags">Allow/Deny access: </p>
+        <table class = "table table-striped table-bordered table-hover table-responsive">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Batch</th>
+                    <th>Accept</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.batch }}</td>
+                    <td><input type="radio" name = "{{user.id}}" value= "Accept"></td>
+                    <td><input type="radio" name = "{{user.id}}" value="Delete"></td>
+                </tr>
+                    {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" id="update-permissions" value="Update" class="btn login-btn btn-warning float-right"id = "submit">
+    </form>
+</div>
+{% endblock %}

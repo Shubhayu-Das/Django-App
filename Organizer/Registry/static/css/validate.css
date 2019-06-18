@@ -1,10 +1,36 @@
+th{
+    font-size: 1.5rem;
+}
+th, td{
+    text-align: center;
+    width: calc(20vw);
+}
 #full{
     width: 60%;
     margin: auto;
+    padding-top: calc(5vh);
 }
 
+#tags{
+    padding: 0%;
+    font-size: 1.8rem;
+}
+
+#ease{
+    visibility: hidden;
+}
+
+.table{
+    width: 100%;
+}
 @media (max-width: 768px){
     #full{
         width:80%;
+    }
+    th{
+        font-size: 1.2rem;
+    }
+    #ease{
+        visibility: visible;
     }
 }

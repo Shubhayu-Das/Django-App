@@ -37,8 +37,10 @@
 
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
-                {% if total > 0 or requiresValidation %}
+                {% if total > 0 %}
                     <span class = "badge badge-danger">{{ total }}</span>
+                {% elif requiresValidation %}
+                    <span class = "badge badge-info">V</span>
                 {% endif %}
             </button>
 
@@ -68,7 +70,7 @@
                     </li>
                     {% if requiresValidation %}
                     <li class = "navbar-nav mr-auto">
-                        <a href = "{% url 'validateStudent' %}" class = "nav-link">Validate</a>
+                        <a href = "{% url 'validateStudent' %}" class = "nav-link">Validate<span class = "badge badge-info">V</span></a>
                     </li>
                     {% endif %}
                 </ul>
