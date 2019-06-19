@@ -9,6 +9,8 @@
     <div id = "attendanceAll">
         <form method="POST">
             {% csrf_token %}
+            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name = "search_field">
+            <input type="submit" name="search" value="search" class="btn btn-outline-success my-2 my-sm-0" id = "submit">
             <a id = "ease" href="#update-attendance" class="float-right" style="text-align: center; color: black"> Update <br> <i class="fas fa-arrow-down"></i></a>
             <p id = "niceness">Take me to:</p>
             <ul id = "guides">
@@ -55,7 +57,7 @@
                     </div>
 
                 </table>
-                <input type="submit" id = "update-attendance" value="Delete" class="btn login-btn btn-warning float-right" id = "submit">
+                <input type="submit" name="delete" id = "update-attendance" value="Delete" class="btn login-btn btn-warning float-right" id = "submit">
             </div>
         </form>
     </div>

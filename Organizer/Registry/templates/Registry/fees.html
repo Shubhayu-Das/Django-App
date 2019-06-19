@@ -10,7 +10,8 @@
     <form method="POST">
         {% csrf_token %}
         <a id = "ease" href="#update-fees" class="float-right" style="text-align: center; color: black"> Update <br> <i class="fas fa-arrow-down"></i></a>
-
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" name = "search_field">
+        <input type="submit" name="search" value="search" class="btn btn-outline-success my-2 my-sm-0" id = "submit">
         <p id="niceness">Take me to:</p>
         <ul id = "guides">
             <li>
@@ -63,7 +64,7 @@
                 </div>
 
             </table>
-            <input type="submit" id = "update-fees" value="Update" class="btn login-btn btn-warning float-right" id = "submit">
+            <input type="submit" name = "fees" id = "update-fees" value="Update" class="btn login-btn btn-warning float-right" id = "submit">
         </div>
     </form>
 </div>{% endblock %}

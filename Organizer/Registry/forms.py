@@ -9,7 +9,7 @@ class LoginForm(forms.Form):
 class SelectStudentForm(forms.Form):
     model = storeData
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
-    
+    search_field = forms.CharField()
 class RegistrationForm(forms.ModelForm):
     username = forms.CharField()
     password = forms.CharField(widget = forms.PasswordInput)
@@ -23,10 +23,10 @@ class RegistrationForm(forms.ModelForm):
 
 class AttendanceForm(forms.Form):
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
-
+    search_field = forms.CharField()
 class FileUploadForm(forms.ModelForm):
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
-    
+    search_field = forms.CharField()
     class Meta:
         model = FileUpload
         fields = ('description', 'uploadedFile')
@@ -51,3 +51,5 @@ class phoneNumber(forms.Form):
 
 class delete_form(forms.Form):
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
+    search_field = forms.CharField()
+    

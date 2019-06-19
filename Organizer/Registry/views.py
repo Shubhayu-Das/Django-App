@@ -178,17 +178,34 @@ def attendance(request):
         args = {}
 
         if request.method == 'POST':
-            present = []
-            form = AttendanceForm(request.POST)
+            if 'attendance' in request.POST:
+                present = []
+                form = AttendanceForm(request.POST)
 
-            if form.is_valid:
-                for user in storeData.objects.values():
-                    if request.POST.get(str(user['id'])):
-                        present.append(user['id'])
+                if form.is_valid:
+                    for user in storeData.objects.values():
+                        if request.POST.get(str(user['id'])):
+                            present.append(user['id'])
 
-                markPresent(present)
-                return redirect('studentsData')
+                    markPresent(present)
+                    return redirect('studentsData')
+            if 'search' in request.POST:
+                LIST_OF_CHOICES_1 = []
+                LIST_OF_CHOICES_2 = []
+                search = request.POST.get("search_field")
+                similar_users = storeData.objects.filter(username__icontains=search)
+                similar_users = similar_users.values()
+                form = AttendanceForm()
+                for user in similar_users:
+                    if not user['is_superuser'] and user['validated']:
+                        if user['batch_number'] == 1:
+                            LIST_OF_CHOICES_1.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastAttended': user['last_class_attended'].date()})
+                        else:
+                            LIST_OF_CHOICES_2.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastAttended': user['last_class_attended'].date()})
 
+                args = {'form': form ,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
+
+                return render(request, 'Registry/attendance.html', args)
         else:
             LIST_OF_CHOICES_1 = []
             LIST_OF_CHOICES_2 = []
@@ -215,18 +232,35 @@ def fees(request):
         args = {}
 
         if request.method == 'POST':
-            present = []
-            form = AttendanceForm(request.POST)
+            if 'fees' in request.POST:
+                present = []
+                form = AttendanceForm(request.POST)
 
-            if form.is_valid:
-                for user in storeData.objects.values():
-                    if request.POST.get(str(user['id'])):
-                        User = storeData.objects.get(id = str(user['id']))
-                        User.last_fees_paid = getTime()
-                        User.save()
-                        
-                return redirect('fees')
+                if form.is_valid:
+                    for user in storeData.objects.values():
+                        if request.POST.get(str(user['id'])):
+                            User = storeData.objects.get(id = str(user['id']))
+                            User.last_fees_paid = getTime()
+                            User.save()
+                            
+                    return redirect('fees')
+            if 'search' in request.POST:
+                LIST_OF_CHOICES_1 = []
+                LIST_OF_CHOICES_2 = []
+                search = request.POST.get("search_field")
+                similar_users = storeData.objects.filter(username__icontains=search)
+                similar_users = similar_users.values()
+                form = AttendanceForm()
+                for user in similar_users:
+                    if not user['is_superuser'] and user['validated']:
+                        if user['batch_number'] == 1:
+                            LIST_OF_CHOICES_1.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastFeesPaid': user['last_fees_paid'].date()})
+                        else:
+                            LIST_OF_CHOICES_2.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastFeesPaid': user['last_fees_paid'].date()})
 
+                args = {'form': form ,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
+
+                return render(request, 'Registry/fees.html', args)
         else:
             LIST_OF_CHOICES_1 = []
             LIST_OF_CHOICES_2 = []
@@ -259,7 +293,7 @@ def validateStudent(request):
                         student.save()
                     elif(response == "Delete"):
                         student.delete()
-                return redirect('admin-home')
+                return redirect('adminhome')
             #List of unvalidated users.
         else:
             form = ValidationForm()
@@ -319,36 +353,48 @@ def adminSendMessage(request):
     if checkStatus(request):
         args = {}
         if request.method == 'POST':
-            
-            recipients = []
-            form = SelectStudentForm(request.POST)
-            
-            if form.is_valid:
-                message = request.POST['message']
+            if 'send' in request.POST:
+                recipients = []
+                form = SelectStudentForm(request.POST)
                 
-                if request.POST.get('selectall'):
-                    recipients = storeData.objects.filter(is_superuser = 0)
-                    recipients = recipients.values()
+                if form.is_valid:
+                    message = request.POST['message']
+                    
+                    if request.POST.get('selectall'):
+                        recipients = storeData.objects.filter(is_superuser = 0)
+                        recipients = recipients.values()
 
-                elif request.POST.get('batch1'):
-                    recipients = storeData.objects.filter(batch_number = 1)
-                    recipients = recipients.values()
-                
-                elif request.POST.get('batch2'):
-                    recipients = storeData.objects.filter(batch_number = 2)
-                    recipients = recipients.values()
+                    elif request.POST.get('batch1'):
+                        recipients = storeData.objects.filter(batch_number = 1)
+                        recipients = recipients.values()
+                    
+                    elif request.POST.get('batch2'):
+                        recipients = storeData.objects.filter(batch_number = 2)
+                        recipients = recipients.values()
 
-                else:
-                    for user in storeData.objects.values():
-                        if request.POST.get(str(user['id'])):
-                            recipients.append(user)
-                
-                # Function to save the the message to the database
-                sendMessage(request, message, recipients)
-                messages.info(request, 'Message has been sent.')
-                
-                return redirect('adminhome')
-            
+                    else:
+                        for user in storeData.objects.values():
+                            if request.POST.get(str(user['id'])):
+                                recipients.append(user)
+                    
+                    # Function to save the the message to the database
+                    sendMessage(request, message, recipients)
+                    messages.info(request, 'Message has been sent.')
+                    
+                    return redirect('adminhome')
+            if 'search' in request.POST:
+                form = SelectStudentForm()
+                LIST_OF_CHOICES = []
+                search = request.POST.get("search_field")
+                similar_users = storeData.objects.filter(username__icontains=search)
+                similar_users = similar_users.values()
+                for user in similar_users:
+                    if not user['is_superuser'] and user['validated']:
+                        LIST_OF_CHOICES.append(user)
+
+                args = {"form": form, "students": LIST_OF_CHOICES}
+
+                return render(request, 'Registry/adminSendMessage.html', args)
         else:
             form = SelectStudentForm()
             LIST_OF_CHOICES = []
@@ -401,36 +447,48 @@ def adminUploadFile(request):
         args = {}
 
         if request.method == 'POST':
-            
-            recipients = []
-            form = FileUploadForm(request.POST, request.FILES)
+            if 'upload' in request.POST:
+                recipients = []
+                form = FileUploadForm(request.POST, request.FILES)
 
-            if form.is_valid():
-                form.save()
-                
-                if request.POST.get('selectall'):
-                    recipients = storeData.objects.filter(is_superuser = 0)
-                    recipients = recipients.values()
+                if form.is_valid():
+                    form.save()
+                    
+                    if request.POST.get('selectall'):
+                        recipients = storeData.objects.filter(is_superuser = 0)
+                        recipients = recipients.values()
 
-                elif request.POST.get('batch1'):
-                    recipients = storeData.objects.filter(batch_number = 1)
-                    recipients = recipients.values()
-                
-                elif request.POST.get('batch2'):
-                    recipients = storeData.objects.filter(batch_number = 2)
-                    recipients = recipients.values()
+                    elif request.POST.get('batch1'):
+                        recipients = storeData.objects.filter(batch_number = 1)
+                        recipients = recipients.values()
+                    
+                    elif request.POST.get('batch2'):
+                        recipients = storeData.objects.filter(batch_number = 2)
+                        recipients = recipients.values()
 
+                    else:
+                        for user in storeData.objects.values():
+                            if request.POST.get(str(user['id'])):
+                                recipients.append(user)
+                    
+                    upload(recipients)
+                    messages.info(request, 'File has been uploaded.')
+                    return redirect('adminhome')
                 else:
-                    for user in storeData.objects.values():
-                        if request.POST.get(str(user['id'])):
-                            recipients.append(user)
-                
-                upload(recipients)
-                messages.info(request, 'File has been uploaded.')
-                
-                return redirect('adminhome')
-            else:
-                return redirect('adminUploadFile')
+                    return redirect('adminUploadFile')
+
+            if 'search' in request.POST:
+                form = FileUploadForm()
+                LIST_OF_CHOICES = []
+                search = request.POST.get("search_field")
+                similar_users = storeData.objects.filter(username__icontains=search) 
+                for user in similar_users:
+                    if not user.is_superuser:
+                        LIST_OF_CHOICES.append(user)
+
+                args = {"form": form, "students": LIST_OF_CHOICES}
+                print("Here")
+                return render(request, 'Registry/adminUploadFile.html', args)
         else:
             form = FileUploadForm()
             LIST_OF_CHOICES = []
@@ -714,7 +772,7 @@ def recoverPassword(request):
         except:
             messages.info('This phone number is not present. Check out with other phone numbers that you may have used')
     else:
-        form = phone_number()
+        form = phoneNumber()
     return render(request, 'Registry/recover.html', {'form': form})
 
 def sendMail(user):
@@ -726,15 +784,33 @@ def sendMail(user):
 
 def deleteUser(request):
     if request.method == 'POST':
-        form = delete_form(request.POST)
-        selected_users = []
-        for user in storeData.objects.values():
-                if request.POST.get(str(user['id'])):
-                    student = storeData.objects.get(username = user['username'])
-                    print(student.username)
-                    student.delete()
-        messages.info(request, 'Selected users deleted.')
-        return HttpResponseRedirect('/admin-home/')
+        if 'delete' in request.POST:
+            form = delete_form(request.POST)
+            selected_users = []
+            for user in storeData.objects.values():
+                    if request.POST.get(str(user['id'])):
+                        student = storeData.objects.get(username = user['username'])
+                        print(student.username)
+                        student.delete()
+            messages.info(request, 'Selected users deleted.')
+            return HttpResponseRedirect('/admin-home/')
+        if 'search' in request.POST:
+            search = request.POST.get("search_field")
+            similar_users = storeData.objects.filter(username__icontains=search) 
+            LIST_OF_CHOICES_1 = []
+            LIST_OF_CHOICES_2 = []
+
+            for user in similar_users:
+                if not user.is_superuser and user.validated:
+                    if user.batch_number == 1:
+                        LIST_OF_CHOICES_1.append({'name': user.username, 'id': user.id}) 
+                    else:
+                        LIST_OF_CHOICES_2.append({'name': user.username, 'id': user.id})
+
+            form = delete_form()
+            args = {'form': form,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
+
+            return render(request, 'Registry/deleteUser.html', args)
     else:
         LIST_OF_CHOICES_1 = []
         LIST_OF_CHOICES_2 = []
@@ -746,6 +822,6 @@ def deleteUser(request):
                     LIST_OF_CHOICES_2.append({'name': user['username'], 'id': user['id']})
 
         form = delete_form()
-        args = {'form': form ,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
+        args = {'form': form,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
 
         return render(request, 'Registry/deleteUser.html', args)
