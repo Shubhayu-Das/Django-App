@@ -104,9 +104,16 @@ def register(request):
 def loginAdminHome(request):
     if checkStatus(request):
         appearance = False
-        for user in storeData.objects.values():
-            if not user['validated']:
-                appearance = True
+        
+        count = storeData.objects.filter(validated=0)
+        if count is not None:
+            appearance = True
+        
+        currentTime = getTime()
+        deleteThreshold = currentTime - timedelta(weeks = 8)
+        old_files = []
+        old_files = FileUpload.objects.filter(upload_time__lte = deleteThreshold)
+        deleteOldFiles(old_files)
 
         user = storeData.objects.get(id = request.session.get('user_info'))
         args = {'requiresValidation': appearance, 'messagesUnseen': user.unseen_message_count, 'total':user.unseen_message_count+user.unseen_file_count}
@@ -487,7 +494,6 @@ def adminUploadFile(request):
                         LIST_OF_CHOICES.append(user)
 
                 args = {"form": form, "students": LIST_OF_CHOICES}
-                print("Here")
                 return render(request, 'Registry/adminUploadFile.html', args)
         else:
             form = FileUploadForm()
@@ -746,7 +752,6 @@ def download(ids):
             content_type = 'application/pdf'
 
         print(file_path)
-        #file_path = os.path.join(settings.MEDIA_ROOT, path)
         if os.path.exists(file_path):
             with open(file_path, 'rb') as fh:
                 response = HttpResponse(fh.read(), content_type=content_type )
@@ -760,6 +765,14 @@ def deleteOldMessage(messages):
         print(message.message)
         message.delete()
     
+def deleteOldFiles(files):
+    for file_name in files:
+        file_path = settings.MEDIA_ROOT + file_name.uploadedFile.url
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        
+        file_name.delete()
+
 def recoverPassword(request):
     if request.method == 'POST':
         form = phoneNumber(request.POST)
