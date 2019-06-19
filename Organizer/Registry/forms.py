@@ -26,7 +26,7 @@ class AttendanceForm(forms.Form):
     search_field = forms.CharField()
 class FileUploadForm(forms.ModelForm):
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
-    search_field = forms.CharField()
+    search_field = forms.CharField(required = False)
     class Meta:
         model = FileUpload
         fields = ('description', 'uploadedFile')

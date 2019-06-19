@@ -429,12 +429,9 @@ def adminViewFile(request):
                 form = FileDownloadForm(request.POST)
 
                 if form.is_valid():
-                    lst = []
-                    for File in FileUpload.objects.values():
-                        if request.POST.get(str(File['id'])):
-                            print("inside if condition")
-                            lst.append(File['id'])
-                    return download(lst)
+                    id = int(request.POST.get('fileField'))
+                    return download(id)
+
             else:
                 for File in FileUpload.objects.values():
                     args["Files"].append({"id": File["id"], "name": os.path.basename(FileUpload.objects.get(id = File['id']).uploadedFile.path), "date": str(File['upload_time'].date()), 'description': File['description']})
@@ -594,11 +591,8 @@ def downloadFile(request):
             form = FileDownloadForm(request.POST)
 
             if form.is_valid():
-                lst = []
-                for File in FileUpload.objects.values():
-                    if request.POST.get(str(File['id'])):
-                        lst.append(File['id'])
-                return download(lst)
+                id = int(request.POST.get('fileField'))
+                return download(id)
         else:
             for File in FileUpload.objects.values():
                 if str(user.username) in File['allowedUsers']:
@@ -734,31 +728,30 @@ def errorMessage(request, errorCode = None):
     elif errorCode == 'wrongPassword':
         messages.info(request, 'Please enter the correct password')
 
-def download(ids):
+def download(id):
 
-    for id in ids:
-        file_name = FileUpload.objects.get(id = id).uploadedFile.url
-        file_path = settings.MEDIA_ROOT + file_name
-        
-        content_type = None
-        extension = os.path.splitext(file_name)[1][1:]
-        if extension == 'png':
-            content_type = 'image/png'
-        elif extension == 'jpg':
-            content_type = 'image/jpg'
-        elif extension == 'jpeg':
-            content_type = 'image/jpeg'
-        elif extension == 'pdf':
-            content_type = 'application/pdf'
+    file_name = FileUpload.objects.get(id = id).uploadedFile.url
+    file_path = settings.MEDIA_ROOT + file_name
+    
+    content_type = None
+    extension = os.path.splitext(file_name)[1][1:]
+    if extension == 'png':
+        content_type = 'image/png'
+    elif extension == 'jpg':
+        content_type = 'image/jpg'
+    elif extension == 'jpeg':
+        content_type = 'image/jpeg'
+    elif extension == 'pdf':
+        content_type = 'application/pdf'
 
-        print(file_path)
-        if os.path.exists(file_path):
-            with open(file_path, 'rb') as fh:
-                response = HttpResponse(fh.read(), content_type=content_type )
-                response['Content-Disposition'] = 'attachment; filename='+os.path.basename(file_path)
-                return response
+    print(file_path)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type=content_type )
+            response['Content-Disposition'] = 'attachment; filename='+os.path.basename(file_path)
+            return response
 
-        raise Http404
+    raise Http404
 
 def deleteOldMessage(messages):
     for message in messages:

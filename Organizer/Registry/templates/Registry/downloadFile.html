@@ -20,12 +20,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for File in Files %}
-                    <tr>
-                        <td class="mr-auto"> <label for="File.id">{{File.name}}</label> </td>
-                        <td>{{File.date}}</td>
-                        <td> <input type="checkbox" class = "check" id = "{{File.id}}" name = "{{File.id}}"> </td>
-                    </tr>
+                    <fieldset>
+                        {% for File in Files %}
+                        <tr>
+                            <td class="mr-auto"> <label for="File.id">{{File.name}}</label> </td>
+                            <td>{{File.date}}</td>
+                            <td> <input type="radio" class = "check" id = "{{File.id}}" name="fileField" value = "{{File.id}}"> </td>
+                        </tr>
+                    </fieldset>
                     {% endfor %}
                 </tbody>
             </table>
