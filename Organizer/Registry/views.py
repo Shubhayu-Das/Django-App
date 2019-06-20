@@ -1,6 +1,5 @@
 from .forms import *
 from .models import Message, storeData, FileUpload
-from datetime import datetime
 import os
 from django.contrib import messages
 from django.shortcuts import render, HttpResponseRedirect, redirect
@@ -102,13 +101,14 @@ def register(request):
 
 # Leads to the home page for the admin, where all the attendance, fees and other activities are there
 def loginAdminHome(request):
-    if checkStatus(request):
+    if checkStatus(request, sudo = True) == "superuser":
         appearance = False
         
-        count = storeData.objects.filter(validated=0)
-        if count is not None:
-            appearance = True
         
+        if storeData.objects.filter(validated=0):
+            appearance = True
+
+        print("Appearance: ",appearance)
         currentTime = getTime()
         deleteThreshold = currentTime - timedelta(weeks = 8)
         old_files = []
@@ -152,7 +152,7 @@ def loginStudentHome(request):
 # Show basic data like the email id and the phone number details(Admin page)
 def studentsData(request):
 
-    if checkStatus(request):
+    if checkStatus(request, sudo = True) == "superuser":
         args = {'batch1':[], 'batch2': []}
         
         for user in storeData.objects.values():
@@ -181,7 +181,7 @@ def studentsData(request):
 # Mark and store the attendance functionalities(Admin page)
 def attendance(request):
 
-    if checkStatus(request):
+    if checkStatus(request, sudo = True) == "superuser":
         args = {}
 
         if request.method == 'POST':
@@ -196,6 +196,7 @@ def attendance(request):
 
                     markPresent(present)
                     return redirect('studentsData')
+                    
             if 'search' in request.POST:
                 LIST_OF_CHOICES_1 = []
                 LIST_OF_CHOICES_2 = []
@@ -235,7 +236,7 @@ def attendance(request):
 
 # The last fees paid date
 def fees(request):
-    if checkStatus(request):
+    if checkStatus(request, sudo = True) == "superuser":
         args = {}
 
         if request.method == 'POST':
@@ -288,7 +289,7 @@ def fees(request):
 
 
 def validateStudent(request):
-    if checkStatus(request):
+    if checkStatus(request, sudo = True) == "superuser":
         if request.method == 'POST':
             form = ValidationForm(request.POST)
             if form.is_valid:
@@ -320,7 +321,7 @@ def validateStudent(request):
 
 
 def adminViewMessage(request):
-    if checkStatus(request):
+    if checkStatus(request, sudo = True) == "superuser":
         final = {'received': [], 'sent': []}
         user = storeData.objects.get(is_superuser = 1)
         user.unseen_message_count = 0
@@ -357,7 +358,7 @@ def adminViewMessage(request):
 
 # View for message broadcasting
 def adminSendMessage(request):
-    if checkStatus(request):
+    if checkStatus(request, sudo=True):
         args = {}
         if request.method == 'POST':
             if 'send' in request.POST:
@@ -420,34 +421,30 @@ def adminSendMessage(request):
 
 def adminViewFile(request):
 
-    if checkStatus(request):
+    if checkStatus(request, sudo = True) == "superuser":
         args = {'Files': []}
         userId = request.session.get('user_info')
         user = storeData.objects.get(id = userId)
-        if checkStatus(request):
-            if request.method == 'POST':
-                form = FileDownloadForm(request.POST)
+        if request.method == 'POST':
+            form = FileDownloadForm(request.POST)
 
-                if form.is_valid():
-                    id = int(request.POST.get('fileField'))
-                    return download(id)
+            if form.is_valid():
+                id = int(request.POST.get('fileField'))
+                return download(id)
 
-            else:
-                for File in FileUpload.objects.values():
-                    args["Files"].append({"id": File["id"], "name": os.path.basename(FileUpload.objects.get(id = File['id']).uploadedFile.path), "date": str(File['upload_time'].date()), 'description': File['description']})
-
-                return render(request, 'Registry/adminViewFile.html', args)
-        
         else:
-            errorMessage(request,  'notSignedIn')
-            return redirect('home')
+            for File in FileUpload.objects.values():
+                args["Files"].append({"id": File["id"], "name": os.path.basename(FileUpload.objects.get(id = File['id']).uploadedFile.path), "date": str(File['upload_time'].date()), 'description': File['description']})
+
+            return render(request, 'Registry/adminViewFile.html', args)
+        
     else:
         errorMessage(request, 'notSignedIn')
         return redirect('home')
 
 # Function to upload files to the system
 def adminUploadFile(request):
-    if checkStatus(request):
+    if checkStatus(request, sudo = True) == "superuser":
         args = {}
 
         if request.method == 'POST':
@@ -702,12 +699,18 @@ def upload(recipients):
     newFile.allowedUsers = receivers
     newFile.save()
 
-def checkStatus(request):
+def checkStatus(request, sudo = False):
     userId = request.session.get('user_info')
     try:
         user = storeData.objects.get(id = userId)
         if userId is not None and userId is not -1:
-            return True
+            if user.is_superuser:
+                if sudo:
+                    return "superuser"
+                else:
+                    return False
+            else:
+                return True
         else:
             return False
     except:
