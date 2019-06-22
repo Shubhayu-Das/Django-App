@@ -13,7 +13,7 @@ from django.core.mail import send_mail
  
 # The base home page which leads to login/sign up pages
 def home(request):          
-    if checkStatus(request):
+    try:
         userId = request.session.get('user_info')
         user = storeData.objects.get(id=userId)
 
@@ -23,8 +23,9 @@ def home(request):
             else:
                 return redirect('studenthome')
         else:
+            messages.info(request, "Please login to access the website")
             return render(request, 'home.html')
-    else:
+    except:
         return render(request, 'home.html')
 
 
