@@ -27,7 +27,7 @@
                 </tr>
                 <tr>
                 <td colspan="3" id = "post{{message.id}}" class="accordion-body collapse in">
-                        {{ message.posts }}
+                    {{ message.posts }}
                 </td>
                 </tr>
                 {% endfor %}
@@ -52,6 +52,7 @@
                 </tr>
                 <tr>
                     <td colspan="3" id = "post{{message.id}}" class="accordion-body collapse in">
+                        Receivers: {{ message.receivers }}    <br />
                         {{ message.posts }}
                     </td>
                 </tr>

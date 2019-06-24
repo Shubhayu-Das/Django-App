@@ -344,7 +344,23 @@ def adminViewMessage(request):
         for message in new_message:
 
             if message.sender == str(user.username):
-                final['sent'].append({'id': str(id), 'brief': message.message[:10]+"...", 'posts': message.message, 'dates': str(message.datePosted.date())})
+                receivers = eval(message.allowedUsers)
+
+                if len(storeData.objects.filter(is_superuser=0)) == len(receivers):
+                    receivers = "All students"
+                elif sorted([student.username for student in storeData.objects.filter(batch_number=1)]) == sorted(receivers):
+                    receivers = "Batch #1 only"
+                elif sorted([student.username for student in storeData.objects.filter(batch_number=2)]) == sorted(receivers):
+                    receivers = "Batch #2 only"
+                else:
+                    recipients = ""
+                    for student in receivers:
+                        recipients += student+", "
+
+                    receivers = recipients[:-2]
+                
+                print(receivers)
+                final['sent'].append({'id': str(id), 'brief': message.message[:10]+"...", 'posts': message.message, 'dates': str(message.datePosted.date()), 'receivers': receivers})
 
 
             if str(user.username) in (message.allowedUsers):
