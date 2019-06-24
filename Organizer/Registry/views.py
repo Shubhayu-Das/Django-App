@@ -747,6 +747,10 @@ def download(id):
         content_type = 'image/jpeg'
     elif extension == 'pdf':
         content_type = 'application/pdf'
+    elif extension == 'mp3':
+        content_type = 'audio/mp3'
+    elif extension == 'amr':
+        content_type = 'audio/AMR'
 
     print(file_path)
     if os.path.exists(file_path):
@@ -800,9 +804,9 @@ def deleteUser(request):
             for user in storeData.objects.values():
                     if request.POST.get(str(user['id'])):
                         student = storeData.objects.get(username = user['username'])
-                        print(student.username)
-                        student.delete()
-            messages.info(request, 'Selected users deleted.')
+                        student.validated = 0
+                        student.save()
+            messages.info(request, 'Selected users have been in-validated.')
             return HttpResponseRedirect('/admin-home/')
         if 'search' in request.POST:
             search = request.POST.get("search_field")
@@ -819,8 +823,21 @@ def deleteUser(request):
 
             form = delete_form()
             args = {'form': form,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
-
             return render(request, 'Registry/deleteUser.html', args)
+        if 'change' in request.POST:
+            form = delete_form(request.POST)
+            selected_users = []
+            for user in storeData.objects.values():
+                    if request.POST.get(str(user['id'])):
+                        student = storeData.objects.get(username = user['username'])
+                        if student.batch_number == 1:
+                            student.batch_number = 2
+                            student.save()
+                        else:
+                            student.batch_number = 1
+                            student.save()
+            messages.info(request, 'Batch number of selected users has been changed.')
+            return HttpResponseRedirect('/admin-home/')
     else:
         LIST_OF_CHOICES_1 = []
         LIST_OF_CHOICES_2 = []

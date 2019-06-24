@@ -42,3 +42,5 @@ class FileUpload(models.Model):
     uploadedFile = models.FileField(upload_to = 'files/%Y/')
     upload_time = models.DateTimeField(auto_now_add = True)
     allowedUsers = models.CharField(default = "", max_length = 1000, verbose_name = 'Allowed Users: ')
+    class Meta:
+        ordering = ('-upload_time', )
