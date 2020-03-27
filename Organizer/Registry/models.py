@@ -37,10 +37,9 @@ class Message(models.Model):
 
 
 class FileUpload(models.Model):
-    id = models.AutoField(primary_key = True)
     description = models.CharField(blank = True, max_length = 1000)
-    uploadedFile = models.FileField(upload_to = 'files/%Y/')
+    fileName = models.CharField(max_length=1000, default="temp.txt")
     upload_time = models.DateTimeField(auto_now_add = True)
     allowedUsers = models.CharField(default = "", max_length = 1000, verbose_name = 'Allowed Users: ')
     class Meta:
-        ordering = ('-upload_time', )
+        ordering = ('-upload_time', 'fileName')

@@ -75,9 +75,25 @@ class RegistrationForm(forms.ModelForm):
 class AttendanceForm(forms.Form):
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
     search_field = forms.CharField()
-class FileUploadForm(forms.ModelForm):
+class FileUploadForm(forms.Form):
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
     search_field = forms.CharField(required = False)
+    upload_file = forms.FileField(required=True, widget=forms.FileInput(
+        attrs = {
+            "class": "btn btn-primary",
+            "id": "file-chooser",
+            "value": "Choose File"
+        }
+    ))
+    file_description = forms.CharField(required=True, widget=forms.TextInput(
+        attrs={
+            "class": "form-control text-wrap",
+            "name": "description",
+            "placeholder": "File description / details",
+            "id": "file-desc"
+        }
+    ))
+
     class Meta:
         model = FileUpload
         fields = ('description', 'uploadedFile')

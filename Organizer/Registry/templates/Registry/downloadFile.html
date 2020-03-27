@@ -23,9 +23,9 @@
                     <fieldset>
                         {% for File in Files %}
                         <tr>
-                            <td class="mr-auto"> <label for="File.id">{{File.name}}</label> </td>
+                            <td class="mr-auto"> <label for="files">{{File.description}}</label> </td>
                             <td>{{File.date}}</td>
-                            <td> <input type="radio" class = "check" id = "{{File.id}}" name="fileField" value = "{{File.id}}"> </td>
+                            <td> <input type="radio" name = "fileField" class = "check" id = "files" value = "{{ File.name }}"> </td>
                         </tr>
                     </fieldset>
                     {% endfor %}
