@@ -42,6 +42,13 @@ def login(request):
 
             if response == 'Yes':         
                 user = storeData.objects.get(phone_number = phone_number)
+
+                if datetime.now().strftime('%m') != request.session.get('last_login'):
+                    for user in storeData.objects.all():
+                        user.no_of_class_attended = 0
+                        user.save()
+
+                request.session['last_login'] = datetime.now().month
                 request.session['user_info'] = user.id
                 return redirect('/admin-home/')
 
@@ -109,7 +116,6 @@ def loginAdminHome(request):
         if storeData.objects.filter(validated=0):
             appearance = True
 
-        print("Appearance: ",appearance)
         currentTime = getTime()
         deleteThreshold = currentTime - timedelta(weeks = 8)
         old_files = []
@@ -121,7 +127,7 @@ def loginAdminHome(request):
         return render(request, 'Registry/adminBase.html', args)
     else:
         errorMessage(request, 'notSignedIn')
-        return redirect('home')
+        return redirect('login')
 
 
 #The home page for the students.
@@ -145,7 +151,7 @@ def loginStudentHome(request):
             return render(request, 'Registry/studentBase.html', userData)
         except:
             errorMessage(request, "notSignedIn")
-            return redirect('home')
+            return redirect('login')
     
     errorMessage(request, 'notSignedIn')
     return redirect('home')
@@ -156,22 +162,20 @@ def studentsData(request):
     if checkStatus(request, sudo = True) == "superuser":
         args = {'batch1':[], 'batch2': []}
         
-        for user in storeData.objects.values():
+        for user in storeData.objects.filter(is_superuser = False, validated = True).values():
         
-            if not user['is_superuser'] and user['validated']:
-        
-                temp = {'id': None, 'name': '', 'phoneNumber': '', 'classesAttended': None, 'lastAttended': None, 'feesStatus': False, 'isValidated': False}
-                
-                temp['id'] = (user['id'])
-                temp['name'] = (user['username'])
-                temp['phoneNumber'] = (user['phone_number'])
-                temp['classesAttended'] = (user['no_of_class_attended'])
-                temp['lastAttended'] = (user['last_class_attended'].date())
+            temp = {'id': None, 'name': '', 'phoneNumber': '', 'classesAttended': None, 'lastAttended': None, 'feesStatus': False, 'isValidated': False}
+            
+            temp['id'] = (user['id'])
+            temp['name'] = (user['username'])
+            temp['phoneNumber'] = (user['phone_number'])
+            temp['classesAttended'] = (user['no_of_class_attended'])
+            temp['lastAttended'] = (user['last_class_attended'].date())
 
-                if user['batch_number'] == 1:
-                    args['batch1'].append(temp)
-                else:
-                    args['batch2'].append(temp)
+            if user['batch_number'] == 1:
+                args['batch1'].append(temp)
+            else:
+                args['batch2'].append(temp)
         
         return render(request, 'Registry/studentsData.html', args)
     else:
@@ -181,7 +185,7 @@ def studentsData(request):
 
 # Mark and store the attendance functionalities(Admin page)
 def attendance(request):
-
+    userList = []
     if checkStatus(request, sudo = True) == "superuser":
         args = {}
 
@@ -197,36 +201,27 @@ def attendance(request):
 
                     markPresent(present)
                     return redirect('studentsData')
-                    
+            
+           
             if 'search' in request.POST:
-                LIST_OF_CHOICES_1 = []
-                LIST_OF_CHOICES_2 = []
                 search = request.POST.get("search_field")
-                similar_users = storeData.objects.filter(username__icontains=search)
-                similar_users = similar_users.values()
-                form = AttendanceForm()
-                for user in similar_users:
-                    if not user['is_superuser'] and user['validated']:
-                        if user['batch_number'] == 1:
-                            LIST_OF_CHOICES_1.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastAttended': user['last_class_attended'].date()})
-                        else:
-                            LIST_OF_CHOICES_2.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastAttended': user['last_class_attended'].date()})
-
-                args = {'form': form ,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
-
-                return render(request, 'Registry/attendance.html', args)
+                userList = storeData.objects.filter(username__icontains=search, validated = True, is_superuser = False).values()
+                
         else:
-            LIST_OF_CHOICES_1 = []
-            LIST_OF_CHOICES_2 = []
-            form = AttendanceForm()
-            for user in storeData.objects.values():
-                if not user['is_superuser'] and user['validated']:
-                    if user['batch_number'] == 1:
-                        LIST_OF_CHOICES_1.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastAttended': user['last_class_attended'].date()})
-                    else:
-                        LIST_OF_CHOICES_2.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastAttended': user['last_class_attended'].date()})
+            userList = storeData.objects.filter(validated = True, is_superuser = False).values()
+        
+        LIST_OF_CHOICES_1 = []
+        LIST_OF_CHOICES_2 = []
+        form = AttendanceForm()
+        for user in userList:
+            temp = {'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastAttended': user['last_class_attended'].date()}
 
-            args = {'form': form ,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
+            if user['batch_number'] == 1:
+                LIST_OF_CHOICES_1.append(temp)
+            else:
+                LIST_OF_CHOICES_2.append(temp)
+
+        args = {'form': form ,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
 
         return render(request, 'Registry/attendance.html', args)
     else:
@@ -237,6 +232,7 @@ def attendance(request):
 
 # The last fees paid date
 def fees(request):
+    userList = []
     if checkStatus(request, sudo = True) == "superuser":
         args = {}
 
@@ -253,35 +249,27 @@ def fees(request):
                             User.save()
                             
                     return redirect('fees')
+
             if 'search' in request.POST:
-                LIST_OF_CHOICES_1 = []
-                LIST_OF_CHOICES_2 = []
                 search = request.POST.get("search_field")
-                similar_users = storeData.objects.filter(username__icontains=search)
-                similar_users = similar_users.values()
-                form = AttendanceForm()
-                for user in similar_users:
-                    if not user['is_superuser'] and user['validated']:
-                        if user['batch_number'] == 1:
-                            LIST_OF_CHOICES_1.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastFeesPaid': user['last_fees_paid'].date()})
-                        else:
-                            LIST_OF_CHOICES_2.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastFeesPaid': user['last_fees_paid'].date()})
-
-                args = {'form': form ,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
-
-                return render(request, 'Registry/fees.html', args)
+                userList = storeData.objects.filter(username__icontains=search, is_superuser=False, validated = True).values()
+                
         else:
-            LIST_OF_CHOICES_1 = []
-            LIST_OF_CHOICES_2 = []
-            form = AttendanceForm()
-            for user in storeData.objects.values():
-                if not user['is_superuser'] and user['validated']:
-                    if user['batch_number'] == 1:
-                        LIST_OF_CHOICES_1.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastFeesPaid': user['last_fees_paid'].date()})
-                    else:
-                        LIST_OF_CHOICES_2.append({'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastFeesPaid': user['last_fees_paid'].date()})
+            userList = storeData.objects.filter(is_superuser=False, validated = True).values()
 
-            args = {'form': form ,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
+        LIST_OF_CHOICES_1 = []
+        LIST_OF_CHOICES_2 = []
+        form = AttendanceForm()
+
+        for user in userList:
+            temp = {'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastFeesPaid': user['last_fees_paid'].date()}
+
+            if user['batch_number'] == 1:
+                LIST_OF_CHOICES_1.append(temp)
+            else:
+                LIST_OF_CHOICES_2.append(temp)
+
+        args = {'form': form ,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
 
         return render(request, 'Registry/fees.html', args)
     else:
@@ -307,6 +295,7 @@ def validateStudent(request):
         else:
             form = ValidationForm()
             users = []
+            #? Use of the delete list
             delete = []
             for user in storeData.objects.values():
                 if(user['validated'] == False):
@@ -359,7 +348,6 @@ def adminViewMessage(request):
 
                     receivers = recipients[:-2]
                 
-                print(receivers)
                 final['sent'].append({'id': str(id), 'brief': message.message[:10]+"...", 'posts': message.message, 'dates': str(message.datePosted.date()), 'receivers': receivers})
 
 
@@ -386,16 +374,10 @@ def adminSendMessage(request):
                     message = request.POST['message']
                     
                     if request.POST.get('selectall'):
-                        recipients = storeData.objects.filter(is_superuser = 0)
-                        recipients = recipients.values()
+                        recipients = storeData.objects.filter(is_superuser = 0).values()
 
-                    elif request.POST.get('batch1'):
-                        recipients = storeData.objects.filter(batch_number = 1)
-                        recipients = recipients.values()
-                    
-                    elif request.POST.get('batch2'):
-                        recipients = storeData.objects.filter(batch_number = 2)
-                        recipients = recipients.values()
+                    elif request.POST.get('batch1') or request.POST.get('batch2'):
+                        recipients = storeData.objects.filter(batch_number = 1 if request.POST.get('batch1') else 2).values()
 
                     else:
                         for user in storeData.objects.values():
@@ -407,15 +389,14 @@ def adminSendMessage(request):
                     messages.info(request, 'Message has been sent.')
                     
                     return redirect('adminhome')
+                    
             if 'search' in request.POST:
                 form = SelectStudentForm()
                 LIST_OF_CHOICES = []
                 search = request.POST.get("search_field")
-                similar_users = storeData.objects.filter(username__icontains=search)
-                similar_users = similar_users.values()
+                similar_users = storeData.objects.filter(username__icontains=search, is_superuser = False, validated = True).values()
                 for user in similar_users:
-                    if not user['is_superuser'] and user['validated']:
-                        LIST_OF_CHOICES.append(user)
+                    LIST_OF_CHOICES.append(user)
 
                 args = {"form": form, "students": LIST_OF_CHOICES}
 
@@ -424,9 +405,8 @@ def adminSendMessage(request):
             form = SelectStudentForm()
             LIST_OF_CHOICES = []
 
-            for user in storeData.objects.values():
-                if not user['is_superuser'] and user['validated']:
-                    LIST_OF_CHOICES.append(user)
+            for user in storeData.objects.filter(is_superuser = False, validated = True).values():
+                LIST_OF_CHOICES.append(user)
 
             args = {"form": form, "students": LIST_OF_CHOICES}
 
@@ -666,25 +646,11 @@ def logout(request):
 
 # Function to update the attendance of the students
 def markPresent(present):
-    print(getTime())
     for id in present:
         person = storeData.objects.get(id = id)
         person.last_class_attended = getTime()
         person.no_of_class_attended += 1
         person.save()
-
-   
-    last_month = person.last_class_attended.strftime("%m")
-    if last_month != storeData.objects.get(is_superuser = 1).last_class_attended.strftime("%m"):
-        for user in storeData.objects.all():
-            if user.is_superuser:
-                user.last_class_attended = getTime()
-            elif user.id in present:
-                user.no_of_class_attended = 1
-            else:
-                user.no_of_class_attended = 0
-            
-            user.save()
 
 
 # Save a Message entry from both students and the admin(s)
@@ -857,12 +823,11 @@ def deleteUser(request):
     else:
         LIST_OF_CHOICES_1 = []
         LIST_OF_CHOICES_2 = []
-        for user in storeData.objects.values():
-            if not user['is_superuser'] and user['validated']:
-                if user['batch_number'] == 1:
-                    LIST_OF_CHOICES_1.append({'name': user['username'], 'id': user['id']}) 
-                else:
-                    LIST_OF_CHOICES_2.append({'name': user['username'], 'id': user['id']})
+        for user in storeData.objects.filter(is_superuser = False, validated = True).values():
+            if user['batch_number'] == 1:
+                LIST_OF_CHOICES_1.append({'name': user['username'], 'id': user['id']}) 
+            else:
+                LIST_OF_CHOICES_2.append({'name': user['username'], 'id': user['id']})
 
         form = delete_form()
         args = {'form': form,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}

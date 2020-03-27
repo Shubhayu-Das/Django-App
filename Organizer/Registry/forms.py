@@ -3,18 +3,69 @@ from .models import storeData, FileUpload
 
 class LoginForm(forms.Form):
     model = storeData
-    phone_number = forms.CharField(max_length = 100,)
-    password = forms.CharField(widget = forms.PasswordInput,)
+    phone_number = forms.CharField(max_length = 100,widget=forms.TextInput(
+        attrs={
+            "class": "form-control",
+            "placeholder": "Phone number",
+            "required": "remember",
+            "name": "phone_number"
+        }
+    ))
+    password = forms.CharField(widget = forms.PasswordInput(
+        attrs={
+            "class": "form-control",
+            "placeholder": "Password",
+            "required": "required",
+            "name": "password"
+        }
+    ))
 
 class SelectStudentForm(forms.Form):
     model = storeData
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
     search_field = forms.CharField()
 class RegistrationForm(forms.ModelForm):
-    username = forms.CharField()
-    password = forms.CharField(widget = forms.PasswordInput)
-    confirm_password = forms.CharField(widget = forms.PasswordInput)
-    phone_number = forms.CharField()
+    username = forms.CharField(widget=forms.TextInput(
+        attrs={
+            "class": "form-control",
+            "placeholder": "Username",
+            "name": 'username',
+            "required": "required"
+        }
+    ))
+    password = forms.CharField(widget = forms.PasswordInput(
+        attrs={
+            "class": "form-control",
+            "placeholder": "Password",
+            "required": "required",
+            "name": 'password'
+        }
+    ))
+    confirm_password = forms.CharField(widget = forms.PasswordInput(
+        attrs={
+            "class": "form-control",
+            "placeholder": "Confirm Password",
+            "required": "required",
+            "name": 'password'
+        }
+    ))
+    phone_number = forms.CharField(widget=forms.TextInput(
+        attrs={
+            "class": "form-control",
+            "placeholder": "Contact number",
+            "required": "required",
+            "name": 'phone_number'
+        }
+    ))
+
+    email_address = forms.EmailField(widget=forms.EmailInput(
+        attrs={
+            "class": "form-control",
+            "placeholder": "Email address",
+            "required": "required",
+            "name": 'email_address'
+        }
+    ))
     CHOICE = (('1', 'First',), ('2', 'Second',))
     Batch = forms.ChoiceField(widget = forms.RadioSelect, choices = CHOICE)
     class Meta:
