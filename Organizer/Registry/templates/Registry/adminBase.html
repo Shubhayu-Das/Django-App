@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,110 +13,125 @@
     <link rel="manifest" href='{% static "favicon_io/site.webmanifest" %}'>
     <title>Teacher Page</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+        integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
 
-    <link rel="stylesheet" href = '{% static "css/adminBase.css" %}'>
+    <link rel="stylesheet" href='{% static "css/adminBase.css" %}'>
     {% block style %}
     {% endblock %}
 
 </head>
+
 <body>
-    <script defer src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script defer src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+  integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
+  crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
     <script>
         $(document).ready(function(){
             $("#myModal").modal('show');
         });
     </script>
 
-    <div class = "container-fluid">
-        <nav class = "navbar navbar-expand-lg navbar-dark bg-dark">
-            <a class = "navbar-brand" href="{% url 'adminhome' %}" id = "title"><i class="fas fa-music" style = "padding-right: calc(1vw);"></i>Music</a>
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="{% url 'adminhome' %}" id="title"><i class="fas fa-music"
+                    style="padding-right: calc(1vw);"></i>Music</a>
 
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent"
+                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
                 {% if total > 0 %}
-                    <span class = "badge badge-danger">{{ total }}</span>
+                <span class="badge badge-danger">{{ total }}</span>
                 {% elif requiresValidation %}
-                    <span class = "badge badge-info">V</span>
+                <span class="badge badge-info">V</span>
                 {% endif %}
             </button>
 
-            <div class = "collapse navbar-collapse" id = "navbarContent">
+            <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav mr-auto">
-                    <li class = "nav-item">
-                        <a href = "{% url 'studentsData' %}" class = "nav-link">Students</a>
+                    <li class="nav-item">
+                        <a href="{% url 'studentsData' %}" class="nav-link">Students</a>
                     </li>
-                    <li class = "navbar-nav mr-auto">
-                        <a href = "{% url 'attendance' %}" class = "nav-link">Attendance</a>
+                    <li class="navbar-nav mr-auto">
+                        <a href="{% url 'attendance' %}" class="nav-link">Attendance</a>
                     </li>
-                    <li class = "navbar-nav mr-auto">
-                        <a href = "{% url 'fees' %}" class = "nav-link">Fees</a>
+                    <li class="navbar-nav mr-auto">
+                        <a href="{% url 'fees' %}" class="nav-link">Fees</a>
                     </li>
-                    <li class = "navbar-nav mr-auto">
-                        <a href = "{% url 'adminViewMessage' %}" class = "nav-link">Messages
+                    <li class="navbar-nav mr-auto">
+                        <a href="{% url 'adminViewMessage' %}" class="nav-link">Messages
                             {% if messagesUnseen > 0 %}
-                                <span class = "badge badge-danger">{{ messagesUnseen }}</span>
+                            <span class="badge badge-danger">{{ messagesUnseen }}</span>
                             {% endif %}
                         </a>
                     </li>
-                    <li class = "navbar-nav mr-auto">
-                        <a href = "{% url 'adminViewFile' %}" class = "nav-link">Materials</a>
+                    <li class="navbar-nav mr-auto">
+                        <a href="{% url 'adminViewFile' %}" class="nav-link">Materials</a>
                     </li>
-                    <li class = "navbar-nav mr-auto">
-                        <a href = "{% url 'deleteUser' %}" class = "nav-link">Delete</a>
+                    <li class="navbar-nav mr-auto">
+                        <a href="{% url 'deleteUser' %}" class="nav-link">Delete</a>
                     </li>
                     {% if requiresValidation %}
-                    <li class = "navbar-nav mr-auto">
-                        <a href = "{% url 'validateStudent' %}" class = "nav-link">Validate<span class = "badge badge-info">V</span></a>
+                    <li class="navbar-nav mr-auto">
+                        <a href="{% url 'validateStudent' %}" class="nav-link">Validate<span
+                                class="badge badge-info">V</span></a>
                     </li>
                     {% endif %}
                 </ul>
-                <a href = "{% url 'logout' %}"  class="btn float-right btn-primary" title = "Log out">Log out  <i class="fas fa-sign-out-alt"></i></a>
+                <a href="{% url 'logout' %}" class="btn float-right btn-primary" title="Log out">Log out <i
+                        class="fas fa-sign-out-alt"></i></a>
             </div>
         </nav>
     </div>
-    
-    <div id = "body">
+
+    <div id="body">
         {% block body %}
         {% if messages %}
         <div class="modal" id="myModal" role="dialog">
             <div class="modal-dialog">
-              <!-- Modal content-->
-              <div class="modal-content">
-                <div class="modal-header">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
                         <h4 class="modal-title">Message</h4>
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-                  
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+
+                    </div>
+                    <div class="modal-body">
+                        <p>{% for message in messages %}
+                            {{ message }} <br>
+                            {% endfor %}
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+                    </div>
                 </div>
-                <div class="modal-body">
-                  <p>{% for message in messages %}
-                        {{ message }}  <br>
-                      {% endfor %}
-                  </p>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
-                </div>
-              </div>
             </div>
-          </div>
-          {% endif %}
+        </div>
+        {% endif %}
         {% endblock %}
     </div>
 
     <footer class="footer mr-auto">
         <div class="container-fluid">
-            <div class = "p-1 d-flex align-items-center flex-column bg-dark">
-                <div class = "p-1" id = "contactLinks">
-                   Vidya Udupa: 9902880596
+            <div class="p-1 d-flex align-items-center flex-column bg-dark">
+                <div class="p-1" id="contactLinks">
+                    Vidya Udupa: 9902880596
                 </div>
-                <div id = "contributors">Developed by Karthik Udupa and Shubhayu Das</div>
+                <div id="contributors">Developed by Karthik Udupa and Shubhayu Das</div>
             </div>
         </div>
     </footer>
 </body>
+
 </html>

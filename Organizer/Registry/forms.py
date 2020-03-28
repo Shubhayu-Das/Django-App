@@ -111,8 +111,15 @@ class FileDownloadForm(forms.Form):
     model = FileUpload
     choices = forms.ChoiceField(widget=forms.RadioSelect(), required = False)
 
-class phoneNumber(forms.Form):
-    phone_number = forms.CharField()
+class PhoneNumber(forms.Form):
+    phone_number = forms.CharField(widget = forms.NumberInput(
+        attrs={
+            "class": "form-control",
+            "placeholder": "Contact number",
+            "required": "required",
+            "name": 'phone_number'
+        }
+    ))
     class Meta:
         model = storeData
 

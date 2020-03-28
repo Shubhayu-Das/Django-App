@@ -12,7 +12,7 @@ from django.core.mail import send_mail
 
 
 import dropbox
-dropboxApiKey = ''  # add your api id here
+dropboxApiKey = '5Xefa9EPTMAAAAAAAAAAwKem759fwgfhdLxpwJ9Y5-YDLqVYIbxyPtCI1gYlITW_'  # add your api id here
 
 # The base home page which leads to login/sign up pages
 def home(request):
@@ -358,7 +358,6 @@ def adminViewMessage(request):
                 
                 final['sent'].append({'id': str(id), 'brief': message.message[:10]+"...", 'posts': message.message, 'dates': str(message.datePosted.date()), 'receivers': receivers})
 
-                print(receivers)
                 final['sent'].append({'id': str(id), 'brief': message.message[:10] + "...", 'posts': message.message,
                                       'dates': str(message.datePosted.date()), 'receivers': receivers})
 
@@ -787,7 +786,7 @@ def deleteOldFiles(files):
 
 def recoverPassword(request):
     if request.method == 'POST':
-        form = phoneNumber(request.POST)
+        form = PhoneNumber(request.POST)
         phone_number = request.POST.get('phone_number')
         try:
             user = storeData.objects.get(phone_number=phone_number)
@@ -797,14 +796,14 @@ def recoverPassword(request):
         except:
             messages.info('This phone number is not present. Check out with other phone numbers that you may have used')
     else:
-        form = phoneNumber()
+        form = PhoneNumber()
     return render(request, 'Registry/recover.html', {'form': form})
 
 
 def sendMail(user):
-    subject = str(user.username) + " details."
+    subject = str(user.username) + " account details."
     body = "User password : " + str(user.password)
-    sender = 'Vidya.carnatic.music@gmail.com'
+    sender = settings.EMAIL_HOST_USER
     receiver = user.email_address
     send_mail(subject, body, sender, [receiver, ])
 
@@ -823,16 +822,15 @@ def deleteUser(request):
             return HttpResponseRedirect('/admin-home/')
         if 'search' in request.POST:
             search = request.POST.get("search_field")
-            similar_users = storeData.objects.filter(username__icontains=search)
+            similar_users = storeData.objects.filter(username__icontains=search, is_superuser = False, validated = True)
             LIST_OF_CHOICES_1 = []
             LIST_OF_CHOICES_2 = []
 
             for user in similar_users:
-                if not user.is_superuser and user.validated:
-                    if user.batch_number == 1:
-                        LIST_OF_CHOICES_1.append({'name': user.username, 'id': user.id})
-                    else:
-                        LIST_OF_CHOICES_2.append({'name': user.username, 'id': user.id})
+                if user.batch_number == 1:
+                    LIST_OF_CHOICES_1.append({'name': user.username, 'id': user.id})
+                else:
+                    LIST_OF_CHOICES_2.append({'name': user.username, 'id': user.id})
 
             form = delete_form()
             args = {'form': form, 'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
