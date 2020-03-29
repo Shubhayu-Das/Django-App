@@ -31,10 +31,10 @@
                 </tr>
             {% for user in batch1 %}
             <tr>
-                    <td class = 'name'>{{ user.name }}</td>
-                    <td>{{ user.phoneNumber }}</td>
-                    <td>{{ user.classesAttended }}</td>
-                    <td>{{ user.lastAttended }}</td>
+                    <td class = 'name'>{{ user.username }}</td>
+                    <td>{{ user.phone_number }}</td>
+                    <td>{{ user.no_of_class_attended }}</td>
+                    <td>{{ user.last_class_attended }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -44,10 +44,10 @@
                 </tr>
             {% for user in batch2 %}
             <tr>
-                    <td class = 'name'>{{ user.name }}</td>
-                    <td>{{ user.phoneNumber }}</td>
-                    <td>{{ user.classesAttended }}</td>
-                    <td>{{ user.lastAttended }}</td>
+                    <td class = 'name'>{{ user.username }}</td>
+                    <td>{{ user.phone_number }}</td>
+                    <td>{{ user.no_of_class_attended }}</td>
+                    <td>{{ user.last_class_attended }}</td>
             </tr>
             {% endfor %}
         </tbody>

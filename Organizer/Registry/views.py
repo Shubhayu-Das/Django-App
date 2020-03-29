@@ -1,5 +1,5 @@
 from .forms import *
-from .models import Message, storeData, FileUpload
+from .models import Message, UserData, UploadedFile
 import os
 from django.contrib import messages
 from django.shortcuts import render, HttpResponseRedirect, redirect
@@ -8,17 +8,14 @@ from django.http import HttpResponse, Http404
 from datetime import datetime, timedelta
 
 import pytz
-from django.core.mail import send_mail
 
-
-import dropbox
-dropboxApiKey = '5Xefa9EPTMAAAAAAAAAAwKem759fwgfhdLxpwJ9Y5-YDLqVYIbxyPtCI1gYlITW_'  # add your api id here
+from .supporters import *
 
 # The base home page which leads to login/sign up pages
-def home(request):
+def home_view(request):
     try:
         userId = request.session.get('user_info')
-        user = storeData.objects.get(id=userId)
+        user = UserData.objects.get(id=userId)
 
         if user.is_logged_in:
             if user.is_superuser:
@@ -33,7 +30,7 @@ def home(request):
 
 
 # The page to log in. Handles superusers(admins) and normal users(students) separately
-def login(request):
+def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
 
@@ -44,20 +41,17 @@ def login(request):
             response = authenticate(request, phone_number=phone_number, password=password)
 
             if response == 'Yes':         
-                user = storeData.objects.get(phone_number = phone_number)
-
+                user = UserData.objects.get(phone_number = phone_number)
+                request.session['user_info'] = user.id
                 if datetime.now().strftime('%m') != request.session.get('last_login'):
-                    for user in storeData.objects.all():
+                    for user in UserData.objects.all():
                         user.no_of_class_attended = 0
                         user.save()
 
                 request.session['last_login'] = datetime.now().month
-                request.session['user_info'] = user.id
                 return redirect('/admin-home/')
 
             elif response == "No":
-                user = storeData.objects.get(phone_number=phone_number)
-                request.session['user_info'] = user.id
                 return redirect('/student-home/')
 
             else:
@@ -73,13 +67,11 @@ def login(request):
 
 
 # Function to register new users..
-def register(request):
+def register_view(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
 
         if form.is_valid():
-
-            # Extract relevant data from the form
             username = request.POST.get('username')
             password = request.POST.get('password')
             phone = request.POST.get('phone_number')
@@ -87,14 +79,12 @@ def register(request):
             confirm_password = request.POST.get('confirm_password')
             email_address = request.POST.get('email_address')
             if password == confirm_password:
-                try:
-                    user = storeData.objects.get(username=username, phone_number=phone)
-                    phone_number = storeData.objects.get(phone_number=phone)
+                if len(UserData.objects.filter(phone_number=phone)) != 0:
                     errorMessage(request, 'accountExists')
                     return HttpResponseRedirect('/')
 
-                except:
-                    newUser = storeData(username=username, password=password, phone_number=phone, batch_number=Batch,
+                else:
+                    newUser = UserData(username=username, password=password, phone_number=phone, batch_number=Batch,
                                         email_address=email_address)
                     newUser.save()
                     messages.info(request,
@@ -114,19 +104,15 @@ def register(request):
 
 
 # Leads to the home page for the admin, where all the attendance, fees and other activities are there
-def loginAdminHome(request):
+def login_admin_home_view(request):
     if checkStatus(request, sudo=True) == "superuser":
         appearance = False
+        deleteOldFiles()
 
-        if storeData.objects.filter(validated=0):
+        if UserData.objects.filter(validated=0):
             appearance = True
 
-        currentTime = getTime()
-        deleteThreshold = currentTime - timedelta(weeks=8)
-        old_files = FileUpload.objects.filter(upload_time__lte=deleteThreshold)
-        deleteOldFiles(old_files)
-
-        user = storeData.objects.get(id=request.session.get('user_info'))
+        user = UserData.objects.get(id=request.session.get('user_info'))
         args = {'requiresValidation': appearance, 'messagesUnseen': user.unseen_message_count,
                 'total': user.unseen_message_count + user.unseen_file_count}
         return render(request, 'Registry/adminBase.html', args)
@@ -136,62 +122,38 @@ def loginAdminHome(request):
 
 
 # The home page for the students.
-def loginStudentHome(request):
+def login_student_home_view(request):
     if checkStatus(request):
+        user_id = request.session.get('user_info')
+        user = UserData.objects.get(id=user_id)
 
-        userData = {'id': None, 'name': '', 'classesAttended': None, 'lastAttended': None, 'feesStatus': False}
-        try:
-            user_id = request.session.get('user_info')
-            user = storeData.objects.get(id=user_id)
-            userData['id'] = user.id
-            userData['name'] = user.username
-            userData['classesAttended'] = user.no_of_class_attended
-            userData['lastAttended'] = user.last_class_attended.date()
-            userData['feesStatus'] = user.last_fees_paid.date()
-            userData['messagesUnseen'] = user.unseen_message_count
-            userData['filesUnseen'] = user.unseen_file_count
-            userData['total'] = user.unseen_file_count + user.unseen_message_count
+        args = {}
+        args['id'] = user.id
+        args['name'] = user.username
+        args['classesAttended'] = user.no_of_class_attended
+        args['lastAttended'] = user.last_class_attended.date()
+        args['feesStatus'] = user.last_fees_paid.date()
+        args['messagesUnseen'] = user.unseen_message_count
+        args['filesUnseen'] = user.unseen_file_count
+        args['total'] = user.unseen_file_count + user.unseen_message_count
 
-            return render(request, 'Registry/studentBase.html', userData)
-        except:
-            errorMessage(request, "notSignedIn")
-            return redirect('login')
-    
+        return render(request, 'Registry/studentBase.html', args)
+       
     errorMessage(request, 'notSignedIn')
     return redirect('home')
 
 
 # Show basic data like the email id and the phone number details(Admin page)
-def studentsData(request):
-    if checkStatus(request, sudo=True) == "superuser":
-        args = {'batch1': [], 'batch2': []}
-
+def student_data_view(request):
     if checkStatus(request, sudo = True) == "superuser":
-        args = {'batch1':[], 'batch2': []}
-        
-        for user in storeData.objects.filter(is_superuser = False, validated = True).values():
-        
-            temp = {'id': None, 'name': '', 'phoneNumber': '', 'classesAttended': None, 'lastAttended': None, 'feesStatus': False, 'isValidated': False}
-            
-            temp['id'] = (user['id'])
-            temp['name'] = (user['username'])
-            temp['phoneNumber'] = (user['phone_number'])
-            temp['classesAttended'] = (user['no_of_class_attended'])
-            temp['lastAttended'] = (user['last_class_attended'].date())
-
-            if user['batch_number'] == 1:
-                args['batch1'].append(temp)
-            else:
-                args['batch2'].append(temp)
-        
-        return render(request, 'Registry/studentsData.html', args)
+        return render(request, 'Registry/studentsData.html', findStudent(view='student-data'))
     else:
         errorMessage(request, 'notSignedIn')
         return redirect('home')
 
 
 # Mark and store the attendance functionalities(Admin page)
-def attendance(request):
+def attendance_view(request):
     userList = []
     if checkStatus(request, sudo = True) == "superuser":
         args = {}
@@ -202,33 +164,21 @@ def attendance(request):
                 form = AttendanceForm(request.POST)
 
                 if form.is_valid:
-                    for user in storeData.objects.values():
-                        if request.POST.get(str(user['id'])):
-                            present.append(user['id'])
+                    for user in UserData.objects.all():
+                        if request.POST.get(str(user.id)):
+                            present.append(user.id)
 
                     markPresent(present)
                     return redirect('studentsData')
-            
-           
+
             if 'search' in request.POST:
-                search = request.POST.get("search_field")
-                userList = storeData.objects.filter(username__icontains=search, validated = True, is_superuser = False).values()
-                
+                userList = findStudent(name=request.POST.get("search_field"), view='attendance')
+
         else:
-            userList = storeData.objects.filter(validated = True, is_superuser = False).values()
-        
-        LIST_OF_CHOICES_1 = []
-        LIST_OF_CHOICES_2 = []
+            userList = findStudent(view='attendance')
+
         form = AttendanceForm()
-        for user in userList:
-            temp = {'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastAttended': user['last_class_attended'].date()}
-
-            if user['batch_number'] == 1:
-                LIST_OF_CHOICES_1.append(temp)
-            else:
-                LIST_OF_CHOICES_2.append(temp)
-
-        args = {'form': form ,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
+        args = {'form': form ,'students': userList}
 
         return render(request, 'Registry/attendance.html', args)
     else:
@@ -237,45 +187,29 @@ def attendance(request):
 
 
 # The last fees paid date
-def fees(request):
+def fees_view(request):
     userList = []
     if checkStatus(request, sudo = True) == "superuser":
-        args = {}
-
         if request.method == 'POST':
             if 'fees' in request.POST:
-                present = []
                 form = AttendanceForm(request.POST)
 
                 if form.is_valid:
-                    for user in storeData.objects.values():
-                        if request.POST.get(str(user['id'])):
-                            User = storeData.objects.get(id=str(user['id']))
+                    for User in UserData.objects.all():
+                        if request.POST.get(str(User.id)):
                             User.last_fees_paid = getTime()
                             User.save()
 
                     return redirect('fees')
 
             if 'search' in request.POST:
-                search = request.POST.get("search_field")
-                userList = storeData.objects.filter(username__icontains=search, is_superuser=False, validated = True).values()
+                userList = findStudent(name=request.POST.get("search_field"), view='fees')
                 
         else:
-            userList = storeData.objects.filter(is_superuser=False, validated = True).values()
+            userList = findStudent(view='fees')
 
-        LIST_OF_CHOICES_1 = []
-        LIST_OF_CHOICES_2 = []
         form = AttendanceForm()
-
-        for user in userList:
-            temp = {'name': user['username'], 'id': user['id'], 'number': user['no_of_class_attended'], 'lastFeesPaid': user['last_fees_paid'].date()}
-
-            if user['batch_number'] == 1:
-                LIST_OF_CHOICES_1.append(temp)
-            else:
-                LIST_OF_CHOICES_2.append(temp)
-
-        args = {'form': form ,'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
+        args = {'form': form ,'students': userList}
 
         return render(request, 'Registry/fees.html', args)
     else:
@@ -283,89 +217,65 @@ def fees(request):
         return redirect('home')
 
 
-def validateStudent(request):
+def validate_student_view(request):
     if checkStatus(request, sudo=True) == "superuser":
         if request.method == 'POST':
             form = ValidationForm(request.POST)
             if form.is_valid:
-                for user in storeData.objects.values():
-                    response = request.POST.get(str(user['id']))
-                    student = storeData.objects.get(id=str(user['id']))
+                for student in UserData.objects.all():
+                    response = request.POST.get(str(student.id))
                     if (response == "Accept"):
                         student.validated = True
                         student.save()
                     elif (response == "Delete"):
                         student.delete()
                 return redirect('adminhome')
-            # List of unvalidated users.
         else:
             form = ValidationForm()
-            users = []
-            #? Use of the delete list
-            delete = []
-            for user in storeData.objects.values():
-                if (user['validated'] == False):
-                    users.append({'name': user['username'], 'batch': user['batch_number'], "id": user['id']})
-
-                if (user['is_superuser'] == False):
-                    delete.append({'name': user['username'], 'batch': user['batch_number'], 'id': user['id']})
-
+            users = list(map(lambda user: {
+                'name': user['username'],
+                'batch': user['batch_number'],
+                "id": user['id']
+                }, list(UserData.objects.filter(validated=False)
+            )))
+            
         return render(request, 'Registry/validate.html', {'users': users})
     else:
         errorMessage(request, 'notSignedIn')
         return redirect('home')
 
 
-def adminViewMessage(request):
+def admin_view_message_view(request):
     if checkStatus(request, sudo=True) == "superuser":
         final = {'received': [], 'sent': []}
-        user = storeData.objects.get(is_superuser=1)
+        user = UserData.objects.get(is_superuser=1)
         user.unseen_message_count = 0
         user.save()
-        id = 0
 
-        currentTime = getTime()  # Is 5 hours and 30 minutes ahead of datetime.now()
+        displayThreshold = getTime() - timedelta(weeks=1)
+        new_message = Message.objects.filter(datePosted__gte=displayThreshold, sender = user)
 
-        displayThreshold = currentTime - timedelta(weeks=1)
-        new_message = []
-        new_message = Message.objects.filter(datePosted__gte=displayThreshold)
-
-        deleteThreshold = currentTime - timedelta(weeks=3)
-        old_message = []
-        old_message = Message.objects.filter(datePosted__lte=deleteThreshold)
-
-        deleteOldMessage(old_message)
+        deleteOldMessages()
 
         for message in new_message:
+            receivers = message.allowedUsers.all()
 
-            if message.sender == str(user.username):
-                receivers = eval(message.allowedUsers)
+            if UserData.objects.filter(is_superuser=0) == receivers:
+                receivers = "All students"
+            elif UserData.objects.filter(is_superuser=0, batch_number=1) == receivers:
+                receivers = "Batch #1 only"
+            elif UserData.objects.filter(is_superuser=0, batch_number=2) == receivers:
+                receivers = "Batch #2 only"
+            else:
+                receivers = ", ".join(map(lambda x: x.username, receivers))
+            
+            final['sent'].append({'id': message.id, 'brief': message.message[:10]+"...", 'posts': message.message, 'dates': str(message.datePosted.date()), 'receivers': receivers})
 
-                if len(storeData.objects.filter(is_superuser=0)) == len(receivers):
-                    receivers = "All students"
-                elif sorted([student.username for student in storeData.objects.filter(batch_number=1)]) == sorted(
-                        receivers):
-                    receivers = "Batch #1 only"
-                elif sorted([student.username for student in storeData.objects.filter(batch_number=2)]) == sorted(
-                        receivers):
-                    receivers = "Batch #2 only"
-                else:
-                    recipients = ""
-                    for student in receivers:
-                        recipients += student + ", "
+        for message in Message.objects.filter(allowedUsers__is_superuser=True):
+            final['received'].append(
+                {'id': message.id, 'brief': message.message[:10] + "...", 'posts': message.message,
+                    'dates': str(message.datePosted.date()), 'sender': message.sender})
 
-                    receivers = recipients[:-2]
-                
-                final['sent'].append({'id': str(id), 'brief': message.message[:10]+"...", 'posts': message.message, 'dates': str(message.datePosted.date()), 'receivers': receivers})
-
-                final['sent'].append({'id': str(id), 'brief': message.message[:10] + "...", 'posts': message.message,
-                                      'dates': str(message.datePosted.date()), 'receivers': receivers})
-
-            if str(user.username) in (message.allowedUsers):
-                final['received'].append(
-                    {'id': str(id), 'brief': message.message[:10] + "...", 'posts': message.message,
-                     'dates': str(message.datePosted.date()), 'sender': str(message.sender)})
-            id += 1
         return render(request, 'Registry/adminViewMessage.html', final)
     else:
         errorMessage(request, 'notSignedIn')
@@ -373,7 +283,7 @@ def adminViewMessage(request):
 
 
 # View for message broadcasting
-def adminSendMessage(request):
+def admin_send_message_view(request):
     if checkStatus(request, sudo=True):
         args = {}
         if request.method == 'POST':
@@ -384,41 +294,34 @@ def adminSendMessage(request):
                 if form.is_valid:
                     message = request.POST['message']
 
-                    if request.POST.get('selectall'):
-                        recipients = storeData.objects.filter(is_superuser = 0).values()
+                    if 'selectall' in request.POST:
+                        recipients = UserData.objects.filter(is_superuser = 0)
 
-                    elif request.POST.get('batch1') or request.POST.get('batch2'):
-                        recipients = storeData.objects.filter(batch_number = 1 if request.POST.get('batch1') else 2).values()
+                    elif 'batch1' in request.POST or 'batch2' in request.POST:
+                        recipients = UserData.objects.filter(batch_number = 1 if 'batch1' in request.POST else 2)
 
                     else:
-                        for user in storeData.objects.values():
-                            if request.POST.get(str(user['id'])):
+                        for user in UserData.objects.all():
+                            if request.POST.get(str(user.id)):
                                 recipients.append(user)
 
                     # Function to save the the message to the database
-                    sendMessage(request, message, recipients)
+                    sendMessage(request.session.get('user_info'), message, recipients)
                     messages.info(request, 'Message has been sent.')
 
                     return redirect('adminhome')
                     
             if 'search' in request.POST:
                 form = SelectStudentForm()
-                LIST_OF_CHOICES = []
-                search = request.POST.get("search_field")
-                similar_users = storeData.objects.filter(username__icontains=search, is_superuser = False, validated = True).values()
-                for user in similar_users:
-                    LIST_OF_CHOICES.append(user)
-
+                LIST_OF_CHOICES = findStudent(name=request.POST.get("search_field"), view='findall')
+        
                 args = {"form": form, "students": LIST_OF_CHOICES}
 
                 return render(request, 'Registry/adminSendMessage.html', args)
         else:
             form = SelectStudentForm()
-            LIST_OF_CHOICES = []
-
-            for user in storeData.objects.filter(is_superuser = False, validated = True).values():
-                LIST_OF_CHOICES.append(user)
-
+            LIST_OF_CHOICES = findStudent(view = 'findall')
+            print(LIST_OF_CHOICES)
             args = {"form": form, "students": LIST_OF_CHOICES}
 
         return render(request, 'Registry/adminSendMessage.html', args)
@@ -426,12 +329,12 @@ def adminSendMessage(request):
         errorMessage(request, 'notSignedIn')
         return redirect('home')
 
-
-def adminViewFile(request):
+# View for the admin to see the list of uploaded files and download them
+def admin_view_file_view(request):
     if checkStatus(request, sudo=True) == "superuser":
         args = {'Files': []}
         userId = request.session.get('user_info')
-        user = storeData.objects.get(id=userId)
+        user = UserData.objects.get(id=userId)
         if request.method == 'POST':
             form = FileDownloadForm(request.POST)
 
@@ -440,9 +343,12 @@ def adminViewFile(request):
                 return download(name)
 
         else:
-            for File in FileUpload.objects.values():
-                args["Files"].append({"name": File["fileName"], 
-                                    "date": str(File['upload_time'].date()), 'description': File['description']})
+            args["Files"].append(list(map(lambda File: {
+                "name": File.fileName, 
+                "date": str(File.upload_time.date()),
+                'description': File.description
+                }, \
+                UploadedFile.objects.all())))
 
             return render(request, 'Registry/adminViewFile.html', args)
 
@@ -452,32 +358,28 @@ def adminViewFile(request):
 
 
 # Function to upload files to the system
-def adminUploadFile(request):
+def admin_upload_file_view(request):
     if checkStatus(request, sudo=True) == "superuser":
         args = {}
 
         if request.method == 'POST':
             if 'upload' in request.POST:
                 recipients = []
-                form = FileUploadForm(request.POST, request.FILES)
+                form = UploadedFileForm(request.POST, request.FILES)
                 
                 if form.is_valid():
-                    
                     if request.POST.get('selectall'):
-                        recipients = storeData.objects.filter(is_superuser=0)
-                        recipients = recipients.values()
+                        recipients = UserData.objects.filter(is_superuser=0)
 
                     elif request.POST.get('batch1'):
-                        recipients = storeData.objects.filter(batch_number=1)
-                        recipients = recipients.values()
+                        recipients = UserData.objects.filter(batch_number=1)
 
                     elif request.POST.get('batch2'):
-                        recipients = storeData.objects.filter(batch_number=2)
-                        recipients = recipients.values()
+                        recipients = UserData.objects.filter(batch_number=2)
 
                     else:
-                        for user in storeData.objects.values():
-                            if request.POST.get(str(user['id'])):
+                        for user in UserData.objects.all():
+                            if request.POST.get(str(user.id)):
                                 recipients.append(user)
 
                     upload(request.POST['file_description'], recipients, request.FILES['upload_file'])
@@ -487,10 +389,10 @@ def adminUploadFile(request):
                     return redirect('adminUploadFile')
 
             if 'search' in request.POST:
-                form = FileUploadForm()
+                form = UploadedFileForm()
                 LIST_OF_CHOICES = []
                 search = request.POST.get("search_field")
-                similar_users = storeData.objects.filter(username__icontains=search)
+                similar_users = UserData.objects.filter(username__icontains=search)
                 for user in similar_users:
                     if not user.is_superuser:
                         LIST_OF_CHOICES.append(user)
@@ -498,10 +400,10 @@ def adminUploadFile(request):
                 args = {"form": form, "students": LIST_OF_CHOICES}
                 return render(request, 'Registry/adminUploadFile.html', args)
         else:
-            form = FileUploadForm()
+            form = UploadedFileForm()
             LIST_OF_CHOICES = []
 
-            for user in storeData.objects.values():
+            for user in UserData.objects.values():
                 if not user['is_superuser']:
                     LIST_OF_CHOICES.append(user)
 
@@ -513,35 +415,23 @@ def adminUploadFile(request):
 
 
 # Function for the student to send message to the teacher/superusers
-def studentSendMessage(request):
+def student_send_message_view(request):
     if checkStatus(request):
         args = {}
 
         if request.method == 'POST':
-
             form = SelectStudentForm(request.POST)
-
             if form.is_valid:
 
                 message = request.POST['message']
-
-                for user in storeData.objects.values():
-                    if user['is_superuser'] == True:
-                        admin = user
-                        user['unseen_message_count'] += 1
-                        storeData.objects.get(is_superuser=True).save()
-                l = []
-                l.append(admin)
+                admin = UserData.objects.filter(is_superuser = 1)
 
                 # invoke the message sending function
-                sendMessage(request, message, l)
-
+                sendMessage(request.session.get('user_info'), message, list(admin))
                 messages.info(request, 'Message has been sent.')
 
                 return redirect('/student-home')
-
         else:
-
             form = SelectStudentForm()
             args = {"form": form}
         return render(request, 'Registry/studentSendMessage.html', args)
@@ -551,50 +441,47 @@ def studentSendMessage(request):
 
 
 # A function for the students to see the messages sent by the admin
-def studentViewMessage(request):
+def student_view_message_view(request):
     if checkStatus(request):
         try:
             userId = request.session.get('user_info')
-            user = storeData.objects.get(id=userId)
-            print(user.username)
+            user = UserData.objects.get(id=userId)
+
             user.unseen_message_count = 0
             user.save()
+
             final = {'received': [], 'sent': []}
-            countSent = 0
-            countRcv = 0
-            id = 0
-            for message in Message.objects.values():
-                if countSent < 3:
-                    if message['sender'] == str(user.username):
-                        final['sent'].append(
-                            {'id': str(id), 'brief': message['message'][:10] + "...", 'posts': message['message'],
-                             'dates': str(message['datePosted'].date())})
-                        countSent = countSent + 1
-                if countRcv < 3:
-                    if str(user.username) in (message['allowedUsers']):
-                        final['received'].append(
-                            {'id': str(id), 'brief': message['message'][:10] + "...", 'posts': message['message'],
-                             'dates': str(message['datePosted'].date()), 'sender': str(message['sender'])})
-                        countRcv += 1
-                    id += 1
-                if countRcv == 4 or countSent == 4:
-                    break
+            
+            final['sent'].append(list(map(lambda message: {
+                'id': message.id,
+                'brief': message.message[:10] + "...", 'posts': message.message,
+                'dates': str(message.datePosted.date())}, \
+                Message.objects.filter(sender=user)[:3])))
+            
+            final['sent'].append(list(map(lambda message: {
+                'id': message.id,
+                'brief': message.message[:10] + "...",
+                'posts': message.message,
+                'dates': str(message.datePosted.date())}, \
+                Message.objects.filter(allowedUsers__id=user.id)[:3])))
+
             return render(request, 'Registry/studentViewMessage.html', final)
         except:
             errorMessage(request, 'notSignedIn')
             return redirect('home')
+
     errorMessage(request, 'notSignedIn')
     return redirect('home')
 
-# TODO: will have to redefine the access rights
-def downloadFile(request):
-    args = {"Files": []}
-    userId = request.session.get('user_info')
-    user = storeData.objects.get(id=userId)
-    user.unseen_file_count = 0
-    user.save()
-    
+# Function to allow students to download the files that have been uploaded for them
+def student_download_file_view(request):
     if checkStatus(request):
+        args = {"Files": []}
+        userId = request.session.get('user_info')
+        user = UserData.objects.get(id=userId)
+        user.unseen_file_count = 0
+        user.save()
+    
         if request.method == 'POST':
             form = FileDownloadForm(request.POST)
 
@@ -602,10 +489,9 @@ def downloadFile(request):
                 name = str(request.POST.get('fileField'))
                 return download(name)
         else:
-            for File in FileUpload.objects.values():
-                if str(user.username) in File['allowedUsers']:
-                    args["Files"].append({"name": File["fileName"], 
-                                    "date": str(File['upload_time'].date()), 'description': File['description']})
+            for File in UploadedFile.objects.filter(allowedUsers__id=userId):
+                args["Files"].append({"name": File.fileName, 
+                                "date": str(File.upload_time.date()), 'description': File.file_description})
 
             return render(request, 'Registry/downloadFile.html', args)
 
@@ -613,252 +499,70 @@ def downloadFile(request):
         errorMessage(request, 'notSignedIn')
         return redirect('home')
 
-
-# Function to verify if the password is correct or wrong. Further checks for superuser access
-def getTime():
-    return datetime.now(tz=pytz.timezone('Asia/Kolkata')) + timedelta(hours=5, minutes=30)
-
-
-def authenticate(request, phone_number=None, password=None):
-    try:
-        user = storeData.objects.get(phone_number=phone_number)
-    except:
-        print(phone_number)
-        messages.info(request, "Phone number invalid. Please try with registered phone number.")
-        return "None"
-    if user.validated == True:
-        if password == user.password:
-            user.is_logged_in = True
-            user.save()
-
-        else:
-            if password != user.password:
-                errorMessage(request, "wrongPassword")
-            else:
-                errorMessage(request, "notValidated")
-            return "None"
-
-        if user.is_superuser == True:
-            return "Yes"
-        else:
-            return "No"
-
-        return "None"
-    else:
-        messages.info(request, "Please wait until the admin validates your account")
-        return "None"
-
-
 # Log out the user on button click
-def logout(request):
+def logout_view(request):
     userId = request.session.get('user_info')
-    print(userId)
-    user = storeData.objects.get(id=userId)
+    user = UserData.objects.get(id=userId)
     user.is_logged_in = False
     user.save()
+
     request.session['user_info'] = -1
     return redirect('home')
 
 
-# Function to update the attendance of the students
-def markPresent(present):
-    for id in present:
-        person = storeData.objects.get(id=id)
-        person.last_class_attended = getTime()
-        person.no_of_class_attended += 1
-        person.save()
-
-
-# Save a Message entry from both students and the admin(s)
-def sendMessage(request, message, recipients):
-    receivers = []
-
-    for user in recipients:
-        receivers.append(user['username'])
-        name = storeData.objects.get(username=user['username'])
-        name.unseen_message_count += 1
-        name.save()
-
-    userId = request.session.get('user_info')
-    sender = storeData.objects.get(id=userId)
-
-    message = Message(message=message, allowedUsers=repr(receivers), sender=sender.username, datePosted=getTime())
-    message.save()
-
-
-def upload(description, recipients, upload_file):
-    
-    dbx = dropbox.Dropbox(dropboxApiKey)
-    try:
-        dbx.users_get_current_account()
-    except Error as err:
-        print(err)
-    
-    try:
-        dbx.files_upload(upload_file.read(), '/'+str(upload_file), mode = dropbox.files.WriteMode('overwrite'))
-    except dropbox.exceptions.ApiError as err:
-        if (err.error.is_path() and err.error.get_path().reason.is_insufficient_space()):
-            print("ERROR: Cannot back up; insufficient space.")
-        elif err.user_message_text:
-            print(err.user_message_text)
-        else:
-            print(err)
-
-    
-    receivers = []
-
-    for user in recipients:
-        receivers.append(user['username'])
-        name = storeData.objects.get(username=user['username'])
-        name.unseen_file_count += 1
-        name.save()
-
-    newFile = FileUpload(description=description, fileName=str(upload_file), allowedUsers = receivers)
-    newFile.save()
-
-
-def checkStatus(request, sudo=False):
-    userId = request.session.get('user_info')
-    try:
-        user = storeData.objects.get(id=userId)
-        if userId is not None and userId is not -1:
-            if user.is_superuser:
-                if sudo:
-                    return "superuser"
-                else:
-                    return False
-            else:
-                return True
-        else:
-            return False
-    except:
-        return False
-
-
-def errorMessage(request, errorCode=None):
-    if errorCode == 'notSignedIn':
-        messages.info(request, "You have logged out. Please login again to access content")
-        return redirect('home')
-
-    elif errorCode == 'notValidated':
-        messages.info(request,
-                      'Looks like the teacher has not approved of your account yet. Please try again later or contact the teacher.')
-
-    elif errorCode == 'accountExists':
-        messages.info(request, 'Looks like there is an account with these credentials already.')
-        return redirect('login')
-
-    elif errorCode == 'wrongPassword':
-        messages.info(request, 'Please enter the correct password')
-
-
-def download(name):
-
-    dbx = dropbox.Dropbox(dropboxApiKey)
-    try:
-        dbx.users_get_current_account()
-    except Error as err:
-        print(f"Login error: {err}")
-    try:
-        md, res = dbx.files_download('/'+name)
-    except dropbox.exceptions.HttpError as err:
-        print('*** HTTP error', err)
-        return None
-    print(res)
-    data = res.content
-
-    response = HttpResponse(data)
-    response['Content-Disposition'] = 'attachment; filename=' + name
-    return response
-
-    raise Http404
-
-
-def deleteOldMessage(messages):
-    for message in messages:
-        print(message.message)
-        message.delete()
-
-
-def deleteOldFiles(files):
-    pass
-
-
-def recoverPassword(request):
+# Function to send an email when forgot password option is selected
+def recover_password_view(request):
     if request.method == 'POST':
         form = PhoneNumber(request.POST)
         phone_number = request.POST.get('phone_number')
         try:
-            user = storeData.objects.get(phone_number=phone_number)
+            user = UserData.objects.get(phone_number=phone_number)
             sendMail(user)
             messages.info(request, 'Details sent to your accout mail')
-            return render(request, 'home.html')
+            return redirect('home')
         except:
-            messages.info('This phone number is not present. Check out with other phone numbers that you may have used')
+            messages.info(request, 'This phone number is not present. Check out with other phone numbers that you may have used')
+
+        return redirect('home')
     else:
         form = PhoneNumber()
     return render(request, 'Registry/recover.html', {'form': form})
 
-
-def sendMail(user):
-    subject = str(user.username) + " account details."
-    body = "User password : " + str(user.password)
-    sender = settings.EMAIL_HOST_USER
-    receiver = user.email_address
-    send_mail(subject, body, sender, [receiver, ])
-
-
-def deleteUser(request):
+# Function to delete an user, accessed by the admin
+def delete_user_view(request):
     if request.method == 'POST':
         if 'delete' in request.POST:
             form = delete_form(request.POST)
-            selected_users = []
-            for user in storeData.objects.values():
-                if request.POST.get(str(user['id'])):
-                    student = storeData.objects.get(username=user['username'])
-                    student.validated = 0
-                    student.save()
-            messages.info(request, 'Selected users have been in-validated.')
-            return HttpResponseRedirect('/admin-home/')
-        if 'search' in request.POST:
-            search = request.POST.get("search_field")
-            similar_users = storeData.objects.filter(username__icontains=search, is_superuser = False, validated = True)
-            LIST_OF_CHOICES_1 = []
-            LIST_OF_CHOICES_2 = []
+            selected_user_ids = list(filter(lambda x: int(x) if str.isdigit(x) else None, request.POST.keys()))
+            
+            for id in selected_user_ids:
+                student = UserData.objects.get(id=id)
+                student.validated = False
+                student.save()
 
-            for user in similar_users:
-                if user.batch_number == 1:
-                    LIST_OF_CHOICES_1.append({'name': user.username, 'id': user.id})
-                else:
-                    LIST_OF_CHOICES_2.append({'name': user.username, 'id': user.id})
+            messages.info(request, 'Selected users have been invalidated.')
+            return HttpResponseRedirect('/admin-home/')
+
+        if 'search' in request.POST:
+            
 
             form = delete_form()
-            args = {'form': form, 'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
+            args = {'form': form, 'students': findStudent(request.POST.get("search_field"), view='delete')}
             return render(request, 'Registry/deleteUser.html', args)
+
         if 'change' in request.POST:
             form = delete_form(request.POST)
-            selected_users = []
-            for user in storeData.objects.values():
-                if request.POST.get(str(user['id'])):
-                    student = storeData.objects.get(username=user['username'])
-                    if student.batch_number == 1:
-                        student.batch_number = 2
-                        student.save()
-                    else:
-                        student.batch_number = 1
-                        student.save()
+            selected_user_ids = list(filter(lambda x: int(x) if str.isdigit(x) else None, request.POST.keys()))
+            
+            for id in selected_user_ids:
+                student = UserData.objects.get(id=id)
+                student.batch_number = 3 - student.batch_number
+                student.save()
+
             messages.info(request, 'Batch number of selected users has been changed.')
             return HttpResponseRedirect('/admin-home/')
     else:
-        LIST_OF_CHOICES_1 = []
-        LIST_OF_CHOICES_2 = []
-        for user in storeData.objects.filter(is_superuser = False, validated = True).values():
-            if user['batch_number'] == 1:
-                LIST_OF_CHOICES_1.append({'name': user['username'], 'id': user['id']}) 
-            else:
-                LIST_OF_CHOICES_2.append({'name': user['username'], 'id': user['id']})
-
         form = delete_form()
-        args = {'form': form, 'students': {"batch1": LIST_OF_CHOICES_1, "batch2": LIST_OF_CHOICES_2}}
+        args = {'form': form, 'students': findStudent(view='delete')}
 
         return render(request, 'Registry/deleteUser.html', args)

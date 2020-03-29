@@ -39,10 +39,10 @@
                             </tr>
                             {% for student in students.batch1 %}
                             <tr>
-                                <td>{{ student.name }}</td>
+                                <td>{{ student.username }}</td>
                                 <th><input type="checkbox"  name="{{student.id}}"></th>
-                                <td>{{ student.lastAttended }}</td>
-                                <td>{{ student.number }}</td>
+                                <td>{{ student.last_class_attended }}</td>
+                                <td>{{ student.no_of_class_attended }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -55,10 +55,10 @@
                             </tr>
                             {% for student in students.batch2 %}
                             <tr>
-                                <td>{{ student.name }}</td>
-                                <th><input type="checkbox" name="{{student.id}}"></th>
-                                <td>{{ student.lastAttended }}</td>
-                                <td>{{ student.number }}</td>
+                                <td>{{ student.username }}</td>
+                                <th><input type="checkbox"  name="{{student.id}}"></th>
+                                <td>{{ student.last_class_attended }}</td>
+                                <td>{{ student.no_of_class_attended }}</td>
                             </tr>
                             {% endfor %}
                         </tbody>

@@ -1,14 +1,14 @@
-from .models import storeData
+from .models import UserData
 def uploadFile(recipients):
     receivers = []
 
     for user in recipients:
         receivers.append(user['username'])
-        name = storeData.objects.get(username = user['username'])
+        name = UserData.objects.get(username = user['username'])
         name.unseen_file_count += 1
         name.save()
 
-    newFile = FileUpload.objects.all()[len(FileUpload.objects.all())-1]    
+    newFile = UploadedFile.objects.all()[len(UploadedFile.objects.all())-1]    
     newFile.allowedUsers = receivers
     newFile.save()
 
@@ -19,12 +19,12 @@ def sendMessage(request, message, recipients):
     
     for user in recipients:
         receivers.append(user['username'])
-        name = storeData.objects.get(username = user['username'])
+        name = UserData.objects.get(username = user['username'])
         name.unseen_message_count += 1
         name.save()
 
     userId = request.session.get('user_info')
-    sender = storeData.objects.get(id = userId)
+    sender = UserData.objects.get(id = userId)
     message = Message(message = message, allowedUsers = repr(receivers), sender = sender.username)
     
     message.save()
@@ -40,7 +40,7 @@ def checkStatus(request):
 # Function to update the attendance of the students
 def markPresent(present):
     for id in present:
-        person = storeData.objects.get(id = id)
+        person = UserData.objects.get(id = id)
         person.last_class_attended = datetime.now()
         person.no_of_class_attended += 1
         person.save()

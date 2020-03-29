@@ -1,8 +1,8 @@
 from django import forms
-from .models import storeData, FileUpload
+from .models import UserData, UploadedFile
 
 class LoginForm(forms.Form):
-    model = storeData
+    model = UserData
     phone_number = forms.CharField(max_length = 100,widget=forms.TextInput(
         attrs={
             "class": "form-control",
@@ -21,7 +21,7 @@ class LoginForm(forms.Form):
     ))
 
 class SelectStudentForm(forms.Form):
-    model = storeData
+    model = UserData
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
     search_field = forms.CharField()
 class RegistrationForm(forms.ModelForm):
@@ -69,13 +69,13 @@ class RegistrationForm(forms.ModelForm):
     CHOICE = (('1', 'First',), ('2', 'Second',))
     Batch = forms.ChoiceField(widget = forms.RadioSelect, choices = CHOICE)
     class Meta:
-        model = storeData
+        model = UserData
         fields = ('username', 'phone_number', 'password',)
 
 class AttendanceForm(forms.Form):
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
     search_field = forms.CharField()
-class FileUploadForm(forms.Form):
+class UploadedFileForm(forms.Form):
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
     search_field = forms.CharField(required = False)
     upload_file = forms.FileField(required=True, widget=forms.FileInput(
@@ -95,20 +95,20 @@ class FileUploadForm(forms.Form):
     ))
 
     class Meta:
-        model = FileUpload
+        model = UploadedFile
         fields = ('description', 'uploadedFile')
 
 class ValidationForm(forms.Form):
-    model = storeData
+    model = UserData
     CHOICE = [('1', 'Validate'), ('2', 'Discard')]
     choices = forms.MultipleChoiceField(widget=forms.RadioSelect, choices=CHOICE, required = False)
 
 class FeesPaid(forms.Form):
-    model = storeData
+    model = UserData
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
 
 class FileDownloadForm(forms.Form):
-    model = FileUpload
+    model = UploadedFile
     choices = forms.ChoiceField(widget=forms.RadioSelect(), required = False)
 
 class PhoneNumber(forms.Form):
@@ -121,7 +121,7 @@ class PhoneNumber(forms.Form):
         }
     ))
     class Meta:
-        model = storeData
+        model = UserData
 
 class delete_form(forms.Form):
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)

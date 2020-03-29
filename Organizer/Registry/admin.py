@@ -1,8 +1,8 @@
 from django.contrib import admin
-from .models import Message, storeData, FileUpload
+from .models import Message, UserData, UploadedFile
 
 #admin.site.register(Message)
-@admin.register(FileUpload)
+@admin.register(UploadedFile)
 class PostAdmin(admin.ModelAdmin):
     list_display = ('description', 'fileName', 'upload_time')
     ordering = ('upload_time', )
@@ -10,11 +10,11 @@ class PostAdmin(admin.ModelAdmin):
 
 @admin.register(Message)
 class PostAdmin(admin.ModelAdmin):
-    list_display = ('message', 'datePosted', 'allowedUsers')
-    ordering = ('-datePosted', )
+    list_display = ('message', 'datePosted', 'sender')
+    ordering = ('-datePosted', 'sender')
     search_fields = ('messages',)
 
-@admin.register(storeData)
+@admin.register(UserData)
 class PostAdmin(admin.ModelAdmin):
     list_display = ('username', 'phone_number', 'no_of_class_attended', 'last_fees_paid', 'validated', 'is_logged_in',)
     ordering = ('username', )
