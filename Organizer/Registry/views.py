@@ -128,7 +128,7 @@ def login_student_home_view(request):
     if checkStatus(request):
         user_id = request.session.get('user_info')
         user = UserData.objects.get(id=user_id)
-        print(user)
+
         args = {}
         args['id'] = user.id
         args['name'] = user.username
@@ -420,7 +420,7 @@ def student_send_message_view(request):
         args = {}
 
         if request.method == 'POST':
-            form = SelectStudentForm(request.POST)
+            form = StudentMessageForm(request.POST)
             if form.is_valid:
 
                 message = request.POST['message']
@@ -432,7 +432,7 @@ def student_send_message_view(request):
 
                 return redirect('/student-home')
         else:
-            form = SelectStudentForm()
+            form = StudentMessageForm()
             args = {"form": form}
         return render(request, 'Registry/studentSendMessage.html', args)
 
@@ -458,12 +458,12 @@ def student_view_message_view(request):
                 'dates': str(message.datePosted.date())}, \
                 Message.objects.filter(sender=user)[:3])))
             
-            final['sent'].append(list(map(lambda message: {
+            final['sent'] = list(map(lambda message: {
                 'id': message.id,
                 'brief': message.message[:10] + "...",
                 'posts': message.message,
                 'dates': str(message.datePosted.date())}, \
-                Message.objects.filter(allowedUsers__id=user.id)[:3])))
+                Message.objects.filter(allowedUsers__id=user.id)[:3]))
 
             return render(request, 'Registry/studentViewMessage.html', final)
         except:
@@ -491,7 +491,7 @@ def student_download_file_view(request):
         else:
             for File in UploadedFile.objects.filter(allowedUsers__id=userId):
                 args["Files"].append({"name": File.fileName, 
-                                "date": str(File.upload_time.date()), 'description': File.file_description})
+                                "date": str(File.upload_time.date()), 'description': File.description})
 
             return render(request, 'Registry/downloadFile.html', args)
 

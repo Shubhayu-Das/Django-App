@@ -1,5 +1,5 @@
 from django import forms
-from .models import UserData, UploadedFile
+from .models import UserData, UploadedFile, Message
 
 class LoginForm(forms.Form):
     model = UserData
@@ -24,6 +24,14 @@ class SelectStudentForm(forms.Form):
     model = UserData
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
     search_field = forms.CharField()
+
+class StudentMessageForm(forms.Form):
+    model = Message
+    message = forms.CharField(widget=forms.Textarea(attrs={
+        "id": "message",
+        "placeholder": "Enter your message",
+        "rows": 4
+    }))
 class RegistrationForm(forms.ModelForm):
     username = forms.CharField(widget=forms.TextInput(
         attrs={

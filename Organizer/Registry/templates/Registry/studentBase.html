@@ -2,6 +2,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,95 +13,108 @@
     <link rel="manifest" href='{% static "favicon_io/site.webmanifest" %}'>
     <title>Student Page</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
 
-    <link rel="stylesheet" href = '{% static "css/studentBase.css" %}'>
+    <link rel="stylesheet" href='{% static "css/studentBase.css" %}'>
+    <link rel="stylesheet" href='{% static "css/modal.css" %}'>
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+        integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
     {% block style %}
     {% endblock %}
 
 </head>
 
 <body>
-   
-    <script
-  src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-  integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
-  crossorigin="anonymous"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-    
-    <div class = "container-fluid">
-        <nav class = "navbar navbar-expand-lg navbar-dark bg-dark">
-            <a class = "navbar-brand" href="{% url 'studenthome' %}" id = "title"><i class="fas fa-music" style = "padding-right: calc(1vw);"></i>Music</a>
+    <header>
+        <nav>
+            <a href="{% url 'studenthome' %}" id="title">
+                <i class="fas fa-music"></i>Music</a>
 
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+            <button id="navbar-toggle" onclick="navbarToggle()">
+                <i class="fas fa-bars"></i>
                 {% if total > 0 %}
-                    <span class = "badge badge-danger">{{ total }}</span>
+                <span id="notif-total">{{ total }}</span>
+                {% elif requiresValidation %}
+                <span class="notif">V</span>
                 {% endif %}
             </button>
 
-            <div class = "collapse navbar-collapse" id = "navbarContent">
-                <ul class="navbar-nav mr-auto">
-                    <li class = "navbar-nav mr-auto">
-                        <a href = "{% url 'studentViewMessage' %}" class = "nav-link">Messages
+            <div id="navbarContent">
+                <ul id="navbar-nav">
+                    <li class="nav-item">
+                        <a href="{% url 'studentViewMessage' %}" class="nav-link">Messages
                             {% if messagesUnseen > 0 %}
-                                <span class = "badge badge-danger">{{ messagesUnseen }}</span>
+                            <span class="notif">{{ messagesUnseen }}</span>
                             {% endif %}
                         </a>
                     </li>
-                    <li class = "navbar-nav mr-auto">
-                        <a href = "{% url 'downloadFile' %}" class = "nav-link">Material
-                            {% if filesUnseen > 0 %}
-                                <span class= "badge badge-success">{{ filesUnseen }}</span>
-                            {% endif %}
+                    <li class="nav-item">
+                        <a href="{% url 'downloadFile' %}" class="nav-link">Materials</a>
+                    </li>
+                    <li class='nav-item'>
+                        <a href="{% url 'logout' %}" title="Log out" id="logout">Logout <i class="fas fa-sign-out-alt"
+                                alt=></i>
                         </a>
                     </li>
                 </ul>
-                <a href = "{% url 'logout' %}"  class="btn float-right btn-primary" title = "Log out" id = "logout">Log out  <i class="fas fa-sign-out-alt" style = "color: white; padding-left: calc(0.5vw)"></i></a>
             </div>
         </nav>
-    </div>
+    </header>
+
     {% block body %}
-    <div style="min-height: calc(80vh)">
-    <main role="main" class = "d-flex flex-column" id = "body">
-       
-    <h2 class="ribbon"><strong class="ribbon-content"> Welcome {{ name }}!</strong></h2>
-    <div class="card bg-light text-dark info-card">
-        <div class="card-body"></div>
-        <h4 class="card-title text-center">Details</h4>
-        <p class="card-text text-center">Number of classes attended this month: {{ classesAttended }}</p>
-        <p class="card-text text-center">Last class attended on: {{ lastAttended }}</p>
-        <p class="card-text text-center">Last fees paid on: {{ feesStatus }}</p>
-   
+    <div id="content">
+
+        <h2 class="ribbon"><strong class="ribbon-content"> Welcome {{ name }}!</strong></h2>
+        <div id="card">
+            <div><strong>Details</strong></div>
+            <div>Number of classes attended this month: <strong>{{ classesAttended }}</strong></div>
+            <div>Last class attended on: <strong>{{ lastAttended }}</strong></div>
+            <div>Last fees paid on: <strong>{{ feesStatus }}</strong></div>
+
             {% if messages %}
-                <ul class="messages" style="list-style: none"> 
-                    {% for message in messages %}
-                        <p class="card-text text-center">
-                            <li>{{ message }}</li>
-                        </p>
-                    {% endfor %}
-                </ul>
+            <div id="modal">
+                <!-- Modal content-->
+                <p id="modal-header">
+                    Messages
+                </p>
+                <div id="modal-body">
+                    <p>{% for message in messages %}
+                        {{ message }} <br>
+                        {% endfor %}
+                    </p>
+                </div>
+                <div id="modal-footer">
+                    <button type="button" id='modal-close-button' data-dismiss="modal"
+                        onclick="closeModal()">Close</button>
+                </div>
+            </div>
             {% endif %}
         </div>
-    </main>
     </div>
 
     {% endblock %}
 
-    <footer class="footer mr-auto">
-        <div class="container-fluid">
-            <div class = "p-1 d-flex align-items-center flex-column bg-dark">
-                <div class = "p-1" id = "contactLinks">
-                   Vidya Udupa: 9902880596
-                </div>
-                <div id = "contributors">Developed by Karthik Udupa and Shubhayu Das</div>
-            </div>
+    <footer id="footer">
+        <div id="contact">
+            Vidya Udupa: 9902880596
         </div>
+        <div id="contributors">Developed by Karthik Udupa and Shubhayu Das</div>
     </footer>
+
+    <script>
+        const closeModal = () => {
+            document.querySelector('#modal').style.display = 'none';
+            document.querySelector('#blackout').style.display = 'none';
+        }
+        const navbarToggle = () => {
+            const toggle = document.querySelector('#navbarContent')
+            if (toggle.style.display == 'unset')
+                toggle.style.display = 'none';
+            else
+                toggle.style.display = 'unset';
+        }
+    </script>
+
 </body>
 
 </html>

@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block style %}
-    <link rel="stylesheet" href = {% static "css/downloadFile.css" %}>
+    <link rel="stylesheet" href = '{% static "css/downloadFile.css" %}'>
 {% endblock %}
 
 {% block body %}
@@ -11,10 +11,10 @@
             {% csrf_token %}
             <p id="tags">Files available:</p>
             {% if Files %}
-            <table class = "table table-responsive table-striped table-bordered">
+            <table>
                 <thead>
                     <tr>
-                        <th class="mr-auto">File name</th>
+                        <th>File name</th>
                         <th>Date</th>
                         <th>Select</th>
                     </tr>
@@ -23,15 +23,16 @@
                     <fieldset>
                         {% for File in Files %}
                         <tr>
-                            <td class="mr-auto"> <label for="files">{{File.description}}</label> </td>
+                            <td> <label for="files">{{File.name}}</label> </td>
                             <td>{{File.date}}</td>
-                            <td> <input type="radio" name = "fileField" class = "check" id = "files" value = "{{ File.name }}"> </td>
+                            <td> <input type="radio" name="fileField" class="check" id="files" value="{{ File.name }}">
+                            </td>
                         </tr>
+                        {% endfor %}
                     </fieldset>
-                    {% endfor %}
                 </tbody>
             </table>
-            <input type="submit" value="Download" class="btn btn-warning float-right">
+            <input type="submit" name="download" id="submit-btn" value="Download"/>
         </form>
         {% else %}
             <p id="niceness">No files uploaded at the moment!</p>

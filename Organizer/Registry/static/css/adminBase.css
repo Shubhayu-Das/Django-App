@@ -46,9 +46,6 @@ nav{
     margin-bottom: 0;
 }
 
-.navbar-brand{
-    font-size: calc(5vh);
-}
 
 #navbar-toggle{
     padding: 5px 10px 5px 10px;
@@ -151,6 +148,8 @@ nav{
     border: 1px solid darkblue;
     background-color: lightgray;
     border-radius: 5px;
+    top: 3vh;
+    left: 12vw;
 }
 
 #submit-btn{
@@ -165,13 +164,6 @@ nav{
 .fa-sign-out-alt{
     color: white;
     padding-left: calc(0.5vw);
-}
-
-
-#submit-btn{
-    position: relative;
-    top: 3vh;
-    left: 12vw;
 }
 
 @media (min-width: 768px){

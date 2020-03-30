@@ -1,16 +1,23 @@
-#allMessage{
+#allMessages{
     min-height: calc(80vh);
-    width: 60%;
-    margin: auto;
+    position: relative;
 }
 
 .striped > tbody > tr:nth-child(4n+1) > td, .striped > tbody > tr:nth-child(4n+1) > th {
     background-color: rgba(0, 0, 0, 0.1);
 }
 
-#receivedMessages{
+.accordion-toggle{
+    text-decoration: none;
+}
+
+table{
     max-width: 60%;
     margin: auto;
+}
+
+.fa-arrow-right{
+    font-size: 28px;
 }
 
 #sentMessages{
@@ -22,42 +29,64 @@
 #sender{
     max-width: 60%;
     margin: auto;
-    padding: 20px;
-    padding-left: 0%;
+    font-size: calc(3vh);
+    padding-bottom: calc(3vh);
+    padding-top: calc(5vh);
 }
 
 #sender a{
-    font-size: 2rem;
     text-decoration: none;
+    font-size: 2rem;
+}
+
+.collapse{
+    text-decoration: none;
+}
+
+th, td{
+    text-align: center;
+    word-wrap: break-word;
+    hyphens: auto;
 }
 
 #tags{
     max-width: 60%;
     margin: auto;
     font-size: calc(3vh);
-    padding-top: calc(3vh);
 }
 
-#sender{
+#no-message{
+    width: fit-content;
+    margin: auto;
+}
+
+.hidden{
+    display: none;
+}
+
+a{
     text-decoration: none;
-    font-size: calc(3vh);
 }
 
-#messageTable{
-    padding-top: calc(3vh);
-    z-index: -10;
+tbody > tr:nth-child(even){
+    background-color: lightgray;
 }
 
-th, td{
-    text-align: center;
+tbody > tr:hover{
+    background-color: lightgray;
+}
+
+table, th, td, tr{
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+th, td, tr{
+    padding:2px;
 }
 
 @media (max-width: 768px){
-    #receivedMessages, #sentMessages, #sender, #tags{
+    table, #sentMessages, #sender, #tags{
         max-width: 80%;
-    }
-
-    #allMessage{
-        width: 95%;
     }
 }

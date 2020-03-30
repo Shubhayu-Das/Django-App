@@ -1,47 +1,155 @@
 html, body{
     width: 100%;
-    height: 100%;
+    padding: 0;
+    margin: 0;
+    min-height: 80vh;
+    height: fit-content;
 }
 
-.container-fluid{
-    padding-left: 0%;
-    padding-right: 0%; 
-    margin-right: 0%;
+body{
+    --modal-width: 25vw;
+    --modal-min-height: 10vh;
+    --header-footer-color: rgb(14, 11, 22);
+    --header-footer-text-color: white;
 }
 
-.navbar-brand{
-    font-size: calc(5vh);
+header{
+    width: 100vw;
+    background-color: var(--header-footer-color);
 }
 
-.footer{
-    z-index: 10;
-    width: 100%;
+.notif{
+    border-radius: 50%;
+    font-size: 15px;
+    font-weight: 900;
+    padding: 0 5px 0 5px;
+    color: var(--header-footer-text-color);
+    border: 1px solid white;
+    background-color: rgb(26, 24, 24);
     position: relative;
-    margin-top: 4%;
+    bottom: 15px;
+    right: 5px;
+}
+
+nav{
+    height: fit-content;
+    padding: 5px;
+}
+
+.navbar-nav{
+    list-style: none;
+    display: inline-block;
+    margin-bottom: 0;
+}
+
+#navbar-toggle{
+    padding: 5px 10px 5px 10px;
+    border: 1px solid gray;
+    border-radius: 3px;
+    background-color: lightgray;
+    display: none;
+    float: right;
+    margin-top: 10px;
+}
+
+.nav-link, #title{
+    text-decoration: none;
+    color: var(--header-footer-text-color);
+}
+
+.nav-link{
+    font-size: calc(3vh);
+    min-width: fit-content;
+    padding: 0 5px 0 5px;
+}
+
+.nav-item{
+    width: fit-content;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#content{
+    position: relative;
+    left: 0;
+    padding: 0%;
+    margin: 0%;
+    width: 100vw;
+    min-height: calc(70vh);
+    height: max-content;
+    padding-bottom: 5vh;
+}
+
+#footer{
+    position: fixed;
+    left: 0;
     bottom: 0;
+    width: 100%;
+    height: min-content;
+    background-color: var(--header-footer-color);
+    display: flex;
+    flex-direction: column;
 }
 
-.none{
-    padding-bottom: 0% !important;
+#contact{
+    color:var(--header-footer-text-color);
+    font-size: 24px;
+    text-align: center;
+    margin: 1.25vh auto 0.5vh;
 }
 
-.darkness{
+#contributors{
+    text-align: center;
+    color:var(--header-footer-text-color);
+    word-wrap: break-word;
+    font-size: 0.9rem;
+    margin: 0.5vh auto 1.25vh;
+}
+
+#logout{
     text-decoration: none;
     color: white;
+    width: max-content;
+    border: 2px solid rgb(2, 61, 148);
+    background-color: rgb(52, 111, 199);
+    border-radius: 5px;
+    padding: 5px;
 }
+
+#navbarContent{
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+#navbar-nav{
+    display: flex;
+}
+
+#submit-btn{
+    padding: 5px 10px 5px 10px;
+    height: 2rem;
+    border: 2px solid rgb(5, 54, 187);
+    background-color: rgb(78, 149, 231);
+    border-radius: 5px;
+    font-weight: bolder;
+}
+
+.fa-sign-out-alt{
+    color: white;
+    padding-left: calc(0.5vw);
+}
+
 
 .ribbon {
     font-size: 16px !important;
-    /* This ribbon is based on a 16px font side and a 24px vertical rhythm. I've used em's to position each element for scalability. If you want to use a different font size you may have to play with the position of the ribbon elements */
-   
     width: 50%;
-       
     position: relative;
     background: rgb(73, 70, 70);
     color: #fff;
     text-align: center;
-    padding: 1em 2em; /* Adjust to suit */
-    margin: 2em auto 3em; /* Based on 24px vertical rhythm. 48px bottom margin - normally 24 but the ribbon 'graphics' take up 24px themselves so we double it. */
+    padding: 1em 2em;
+    margin: 2em auto 3em;   
 }
 
 .ribbon:before, .ribbon:after {
@@ -79,48 +187,98 @@ html, body{
     border-width: 1em 1em 0 0;
 }
 
-.info-card{
-    position: relative;
-    width: calc(80vw);
+.ribbon-content{
+    font-size: 1.5rem;
+}
+
+#card{
     margin: auto;
-    margin-top: 0%;
+    width: 50vw;
+    min-height: 20vh;
+    height: fit-content;
+    border: 3px solid rgba(109, 107, 107, 0.4);
+    background-color: rgba(241, 234, 150, 0.5);
+    border-radius: 7px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.nav-link{
-    font-size: calc(3vh);
+#card>div{
+    text-align: center;
+    padding: 2px;
+    font-size: 1.2rem;
 }
 
-#contactLinks{
-    color:white;
-    font-size: 24px;
-}
-
-#contributors{
-    color:white;
-    word-wrap: break-word;
-    font-size: calc(1.5vh);
+#card>div>strong{
+    font-size: 1.4rem;
 }
 
 @media (min-width: 768px){
     #title{
-        padding-left: calc(4vw);
-        padding-right: calc(2vw);
+        padding-left: calc(1vw);
+        font-size: 2.5rem;
+        width: 15vw;
+    }
+   
+    nav{
+        display: flex;
+        flex-direction: row;
     }
 
     #logout{
-        position: fixed;
-        left: 90%;
+        margin-left: 50vw;
+    }
+}
+
+@media (max-width: 768px){
+    #title{
+        font-size: 2.5rem;
     }
 
-    #body{
-        height: calc(76vh);
+    body{
+        --modal-width: 90vw;
+        --modal-min-height: 15vh;
+    }
+
+    #content{
+        height: 90vh;
+        padding-bottom: 10vh;
+    }
+
+    #navbar-toggle{
+        display: unset;
+        width: fit-content;
+        margin-bottom: 5px;
+        margin-right: 5vw;
+    }
+
+    #card{
+        width: 90vw;
+    }
+
+    #navbar-nav{
+        flex-direction: column;
+        padding-left: 0;
+    }
+
+    #navbarContent{
+        display: none;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+    .nav-item{
+        padding-bottom: 10px;
+        font-size: 0.8rem;
+        width: 80vw;
+        position: relative;
+        left: 5px;
+    }
+    .nav-link{
+        width: 60vw;
     }
     
-    .info-card{
-        width: calc(60vw);
-    }
-
-    .ribbon{
-        width: 40%;
+    #submit-btn{
+        left: 1vw;
     }
 }

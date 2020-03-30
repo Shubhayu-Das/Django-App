@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block style %}
-    <link rel="stylesheet" href = {% static "css/studentSendMessage.css" %}>
+    <link rel="stylesheet" href = '{% static "css/studentSendMessage.css" %}'>
 {% endblock %}
 
 {% block body %}
@@ -10,12 +10,10 @@
         <a href="{% url 'studentViewMessage' %}" id = "back"><i class="fas fa-arrow-left"></i> Back</a>
         <form method="POST" id = "form">
             {% csrf_token %}
-            <div class = "form-group" id = "messageBox">
                 <label id = "tag"> Message: </label>
-                <textarea rows = '6' class="form-control text-wrap" type="text" name = "message" placeholder="Message here" id = "getMessage"></textarea>
+                {{ form.message }}
 
-                <div id = "post"><input type="submit" value="Send" class="btn login-btn btn-warning float-right"></div>
-            </div>
+                <input type="submit" value="Send" id="submit-btn">
         </form>
 </div>
 {% endblock %}
