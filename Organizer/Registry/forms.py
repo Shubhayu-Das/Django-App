@@ -5,7 +5,7 @@ class LoginForm(forms.Form):
     model = UserData
     phone_number = forms.CharField(max_length = 100,widget=forms.TextInput(
         attrs={
-            "class": "form-control",
+            "class": "form-fields",
             "placeholder": "Phone number",
             "required": "remember",
             "name": "phone_number"
@@ -13,7 +13,7 @@ class LoginForm(forms.Form):
     ))
     password = forms.CharField(widget = forms.PasswordInput(
         attrs={
-            "class": "form-control",
+            "class": "form-fields",
             "placeholder": "Password",
             "required": "required",
             "name": "password"
@@ -27,7 +27,7 @@ class SelectStudentForm(forms.Form):
 class RegistrationForm(forms.ModelForm):
     username = forms.CharField(widget=forms.TextInput(
         attrs={
-            "class": "form-control",
+            "class": "form-fields",
             "placeholder": "Username",
             "name": 'username',
             "required": "required"
@@ -35,7 +35,7 @@ class RegistrationForm(forms.ModelForm):
     ))
     password = forms.CharField(widget = forms.PasswordInput(
         attrs={
-            "class": "form-control",
+            "class": "form-fields",
             "placeholder": "Password",
             "required": "required",
             "name": 'password'
@@ -43,7 +43,7 @@ class RegistrationForm(forms.ModelForm):
     ))
     confirm_password = forms.CharField(widget = forms.PasswordInput(
         attrs={
-            "class": "form-control",
+            "class": "form-fields",
             "placeholder": "Confirm Password",
             "required": "required",
             "name": 'password'
@@ -51,7 +51,7 @@ class RegistrationForm(forms.ModelForm):
     ))
     phone_number = forms.CharField(widget=forms.TextInput(
         attrs={
-            "class": "form-control",
+            "class": "form-fields",
             "placeholder": "Contact number",
             "required": "required",
             "name": 'phone_number'
@@ -60,7 +60,7 @@ class RegistrationForm(forms.ModelForm):
 
     email_address = forms.EmailField(widget=forms.EmailInput(
         attrs={
-            "class": "form-control",
+            "class": "form-fields",
             "placeholder": "Email address",
             "required": "required",
             "name": 'email_address'
@@ -80,14 +80,12 @@ class UploadedFileForm(forms.Form):
     search_field = forms.CharField(required = False)
     upload_file = forms.FileField(required=True, widget=forms.FileInput(
         attrs = {
-            "class": "btn btn-primary",
             "id": "file-chooser",
             "value": "Choose File"
         }
     ))
     file_description = forms.CharField(required=True, widget=forms.TextInput(
         attrs={
-            "class": "form-control text-wrap",
             "name": "description",
             "placeholder": "File description / details",
             "id": "file-desc"
@@ -112,9 +110,9 @@ class FileDownloadForm(forms.Form):
     choices = forms.ChoiceField(widget=forms.RadioSelect(), required = False)
 
 class PhoneNumber(forms.Form):
-    phone_number = forms.CharField(widget = forms.NumberInput(
+    phone_number = forms.CharField(widget = forms.TextInput(
         attrs={
-            "class": "form-control",
+            "class": "form-fields",
             "placeholder": "Contact number",
             "required": "required",
             "name": 'phone_number'
@@ -123,7 +121,7 @@ class PhoneNumber(forms.Form):
     class Meta:
         model = UserData
 
-class delete_form(forms.Form):
+class DeleteStudentForm(forms.Form):
     choices = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required = False)
     search_field = forms.CharField()
     

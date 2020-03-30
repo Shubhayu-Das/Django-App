@@ -1,88 +1,72 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Sign up</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+        integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
 
-    <link rel="stylesheet" href ='{% static "css/signup.css" %}'>
+    <link rel="stylesheet" href='{% static "css/signup.css" %}'>
 </head>
-<body>
-    <script
-  src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-  integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
-  crossorigin="anonymous"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
-    <div class = "container">
-        <div class = "d-flex justify-content-center h-100">
-            <div class = "card">
-                <div class = "card-header">
-                    <h3>Sign Up</h3>
+<body>
+    <div id="card">
+        <div id="card-header">
+            Sign Up
+        </div>
+        <div id="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    {{ form.username }}
                 </div>
-                <div class = "card-body">
-		            <form method="POST">
-                        {% csrf_token %}
-                        <div class = "input-group form-group">
-                            <div class = "input-group-prepend">
-                                <span class = "input-group-text"><i class="fas fa-user" style = "color:black;"></i></span>
-                            </div>
-                            {{ form.username }}
-                        </div>
-                        <div class = "input-group form-group">
-                            <div class = "input-group-prepend">
-                                <span class = "input-group-text"><i class="fas fa-key" style = "color:black;"></i></span>
-                            </div>
-                            {{ form.password }}
-                        </div>
-                        <div class = "input-group form-group">
-                            <div class = "input-group-prepend">
-                                <span class = "input-group-text"><i class="fas fa-key" style = "color:black;"></i></span>
-                            </div>
-                            {{ form.confirm_password }}
-                        </div>
-                        <div class = "input-group form-group">
-                            <div class = "input-group-prepend">
-                                <span class = "input-group-text"><i class="fas fa-phone-square" style = "color:black;"></i></i></span>
-                            </div>
-                            {{ form.phone_number }}
-                        </div>
-                        <div class = "input-group form-group">
-                            <div class = "input-group-prepend">
-                                <span class = "input-group-text"><i class="fas far fa-envelope-open"></i></i></span>
-                            </div>
-                            {{ form.email_address }}
-                        </div>
-                        <fieldset>
-                        <div class = "input-group form-group">
-                            <label for="batch1" class="labels">Batch 1</label>
-                            <input type="radio" name = "Batch" class="form-control radio" value = 1 id="batch1" checked><br>
-                            <label for="batch2" class="labels">Batch 2</label>
-                            <input type="radio" name = "Batch" class = "form-control radio" value = 2 id="batch2">
-                        </div>
-                        </fieldset>
-                        <div class="card-footer text-center footerInfo">Batch1 : Mon and Thu <br> Batch2: Wed and Sat</div>
-                        <div class="form-group">
-                            <input type="submit" value="Sign up!" class="btn float-right login_btn">
-                        </div>
-                    </form>  
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                    {{ form.phone_number }}
                 </div>
-                <div class='card-footer'>
-                    <div class="d-flex justify-content-center links">
-                        Already have an account? <a href="{% url 'login' %}" style="color: orange">Login</a>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-key"></i></span>
+                    {{ form.password }}
+                </div>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-key"></i></span>
+                    {{ form.confirm_password }}
+                </div>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-envelope-open"></i></span>
+                    {{ form.email_address }}
+                </div>
+                <fieldset>
+                    <div id="batches">
+                        <label for="batch1" class="labels">Batch 1</label>
+                        <input type="radio" name="Batch" class="radio" value=1 id="batch1" checked><br>
+                        <label for="batch2" class="labels">Batch 2</label>
+                        <input type="radio" name="Batch" class="radio" value=2 id="batch2">
                     </div>
-                </div>
+                </fieldset>
+                <div id="info">Batch1 : Mon and Thu <br> Batch2: Wed and Sat</div>
+                <input type="submit" value="Sign up!" id="login-btn">
+            </form>
+        </div>
+        <div id="card-footer">
+            <div class="links">
+
+            </div>
+            <div class="links">
+                Already have an account? <a href="{% url 'login' %}" style="color: orange">Login</a>
+            </div>
+            <div class="links">
+                Forgot Password? <a href="{% url 'recoverPassword' %}">Click here</a>
             </div>
         </div>
     </div>
 
 </body>
+
 </html>

@@ -2,41 +2,42 @@
 {% load static %}
 
 {% block style %}
-    <link rel="stylesheet" href = {% static "css/adminViewFile.css" %}>
+<link rel="stylesheet" href={% static "css/adminViewFile.css" %}>
 {% endblock %}
 
 {% block body %}
-    <div id = 'allFiles'>
-        <h3 id = 'sender'> <a href="{% url 'adminUploadFile' %}">Send a file <i class="fas fa-arrow-right"></i></a> </h3>
-        <p id = "tags">Files Uploaded:</p>
-        
-        {% if Files %}
-        <form method="POST" target="_blank">
-            {% csrf_token %}
-            <table class = "table table-bordered table-responsive table-striped">
-                <thead>
+<div id='allFiles'>
+    <h3 id='sender'> <a href="{% url 'adminUploadFile' %}">Send a file <i class="fas fa-arrow-right"></i></a> </h3>
+    <p id="tags">Files Uploaded:</p>
+
+    {% if Files %}
+    <form method="POST" target="_blank">
+        {% csrf_token %}
+        <table>
+            <thead>
+                <tr>
+                    <th>File name</th>
+                    <th>Date</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                <fieldset>
+                    {% for File in Files %}
                     <tr>
-                        <th class="mr-auto">File name</th>
-                        <th>Date</th>
-                        <th>Select</th>
+                        <td> <label for="files">{{File.name}}</label> </td>
+                        <td>{{File.date}}</td>
+                        <td> <input type="radio" name="fileField" class="check" id="files" value="{{ File.name }}">
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    <fieldset>
-                        {% for File in Files %}
-                        <tr>
-                            <td class="mr-auto"> <label for="files">{{File.description}}</label> </td>
-                            <td>{{File.date}}</td>
-                            <td> <input type="radio" name = "fileField" class = "check" id = "files" value = "{{ File.name }}"> </td>
-                        </tr>
-                        {% endfor %}
-                    </fieldset>
-                </tbody>
-            </table>
-            <input type="submit" id="download" value="Download" class="btn btn-warning float-right">
-            {% else %}
-                <p id = "info-tag">No files uploaded yet!</p>
-            {% endif %}
-        </form>
-    </div>
+                    {% endfor %}
+                </fieldset>
+            </tbody>
+        </table>
+        <input type="submit" id="submit-btn" value="Download" class="btn btn-warning float-right">
+    </form>
+    {% else %}
+    <p id="no-message">No files uploaded yet</p>
+    {% endif %}
+</div>
 {% endblock %}

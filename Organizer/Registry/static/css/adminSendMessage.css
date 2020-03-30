@@ -12,14 +12,9 @@ th, td{
     font-size: 3rem;
 }
 
-#selectTable{
-    width: 50%;
-    margin: auto;
-    padding-top: calc(5vh);
-}
-
-.back{
+#back{
     font-size: 2rem;
+    text-decoration: none;
 }
 
 .fa-arrow-left{
@@ -28,17 +23,64 @@ th, td{
 
 #ease{
     visibility: hidden;
+    text-align: center;
+    color: black;
+    padding: 1rem;
+}
+
+tbody > tr:nth-child(even){
+    background-color: lightgray;
+}
+
+tbody > tr:hover{
+    background-color: lightgray;
+}
+
+table, th, td, tr{
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+th, td, tr{
+    padding:2px;
+}
+
+.labels{
+    width: 10vw;
+}
+
+table{
+    margin: auto;
+    margin-top: 2vh;
+}
+
+#message{
+    border: 1px solid darkgray;
+    background-color: rgb(236, 233, 233);
+    padding: 3px;
+    width: 100%;
+    border-radius: 5px;
 }
 
 @media (max-width: 768px){
     #allMessage{
         width: 80%;
     }
-    #selectTable{
-        width: 100%;
+
+    #search-bar{
+        width: 75%;
+    }
+
+    #tag{
+        font-size: 2rem;
     }
 
     #ease{
         visibility: visible;
+        float: right;
     }
+    
+    .labels{
+        width: 30vw;
+    }    
 }

@@ -2,14 +2,7 @@
     position: relative;
     padding-top: calc(5vh);
     width: max-content;
-}
-
-.table{
-    overflow-x: auto;
-}
-
-.table th{
-    text-align: center;
+    margin: auto;
 }
 
 #niceness{
@@ -34,18 +27,28 @@
     font-size: 2rem;
 }
 
-@media (min-width: 768px){
-    #full{
-        margin: auto;
-    }
+tbody > tr:nth-child(even){
+    background-color: lightgray;
+}
+
+tbody > tr:hover{
+    background-color: lightgray;
+}
+
+table, th, td, tr{
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+th, td, tr{
+    padding:2px;
 }
 
 @media (max-width: 768px){
     #full{
         overflow-x: hidden;
-        margin: auto;
     }
-    .table{
+    #data-table{
         max-width: calc(95vw);
         margin: auto;
     }

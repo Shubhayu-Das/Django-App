@@ -2,20 +2,19 @@
 {% load static %}
 
 {% block style %}
-<link rel="stylesheet" href={% static "css/fees.css" %}>
+<link rel="stylesheet" href='{% static "css/fees.css" %}'>
 {% endblock %}
 
 {% block body %}
-<div id="attendanceAll">
+<div id="feesAll">
     <form method="POST">
         {% csrf_token %}
         <div class="row p-2">
-            <input class="form-control mr-sm-2 mb-md-2" type="search" placeholder="Search by name" aria-label="Search"
-                name="search_field">
-            <input type="submit" name="search" value="search"
-                class="btn btn-outline-success my-2 my-sm-0 offset-9 offset-md-11" id="submit">
+            <input id="search-bar" type="search" placeholder="Search by name" aria-label="Search" name="search_field">
+            <input type="submit" name="search" value="search" id="search-submit">
+
         </div>
-        <a id="ease" href="#update-fees" class="float-right" style="text-align: center; color: black;padding: 0.5rem;">
+        <a id="ease" href="#submit-btn">
             Update <br> <i class="fas fa-arrow-down"></i></a>
         <p id="niceness">Take me to:</p>
         <ul id="guides">
@@ -27,50 +26,47 @@
             </li>
         </ul>
 
-        <div class="form-group" id="formTable">
-            <table class='table table-striped table-bordered'>
-                <thead>
-                    <th>Name</th>
-                    <th>Paid</th>
-                    <th>Last Fees Paid</th>
-                    <th>Numbers of days attended</th>
-                </thead>
+        <table>
+            <thead>
+                <th>Name</th>
+                <th>Paid</th>
+                <th>Last Fees Paid</th>
+                <th>Numbers of days attended</th>
+            </thead>
 
-                <div>
-                    <tbody>
-                        <tr>
-                            <th colspan="4" id="batch1">Batch 1</th>
-                        </tr>
-                        {% for student in students.batch1 %}
-                        <tr>
-                            <td>{{ student.username }}</td>
-                            <th><input type="checkbox" name="{{student.id}}"></th>
-                            <td>{{ student.last_fees_paid }}</td>
-                            <td>{{ student.no_of_class_attended }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </div>
+            <div>
+                <tbody>
+                    <tr>
+                        <th colspan="4" id="batch1">Batch 1</th>
+                    </tr>
+                    {% for student in students.batch1 %}
+                    <tr>
+                        <td>{{ student.username }}</td>
+                        <th><input type="checkbox" name="{{student.id}}"></th>
+                        <td>{{ student.last_fees_paid }}</td>
+                        <td>{{ student.no_of_class_attended }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </div>
 
-                <div>
-                    <tbody>
-                        <tr>
-                            <th colspan="4" id="batch2">Batch 2</th>
-                        </tr>
-                        {% for student in students.batch2 %}
-                        <tr>
-                            <td>{{ student.username }}</td>
-                            <th><input type="checkbox" name="{{student.id}}"></th>
-                            <td>{{ student.last_fees_paid }}</td>
-                            <td>{{ student.no_of_class_attended }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </div>
+            <div>
+                <tbody>
+                    <tr>
+                        <th colspan="4" id="batch2">Batch 2</th>
+                    </tr>
+                    {% for student in students.batch2 %}
+                    <tr>
+                        <td>{{ student.username }}</td>
+                        <th><input type="checkbox" name="{{student.id}}"></th>
+                        <td>{{ student.last_fees_paid }}</td>
+                        <td>{{ student.no_of_class_attended }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </div>
 
-            </table>
-            <input type="submit" name="fees" id="update-fees" value="Update"
-                class="btn login-btn btn-warning float-right" id="submit">
-        </div>
+        </table>
+        <input type="submit" name="fees" value="Update" id="submit-btn">
     </form>
 </div>{% endblock %}

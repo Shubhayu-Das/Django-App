@@ -32,7 +32,7 @@ class Message(models.Model):
     message = models.CharField(max_length = 3000, verbose_name = "Message: ")
     datePosted = models.DateTimeField(verbose_name = "Date Posted: ", default = datetime(1970, 1, 1, tzinfo=timezone('Asia/Kolkata')))
     allowedUsers = models.ManyToManyField(UserData, related_name="allowed_viewers")
-    sender = models.OneToOneField(UserData, on_delete=models.DO_NOTHING)
+    sender = models.ForeignKey(UserData, on_delete=models.CASCADE)
     
     def __str__(self):
         return self.message

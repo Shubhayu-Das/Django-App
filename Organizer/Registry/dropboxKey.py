@@ -1,2 +1,2 @@
 def getDropboxAPIKey():
-    return "5Xefa9EPTMAAAAAAAAAAwQpivMCgSr93Wk7dVI00JQr9zJ0vD4-IFbZ6avXk2Flc"
+    return "5Xefa9EPTMAAAAAAAAAAwsKsyhM6c9g2bGkk7SJTL1qOOKJ9ZDyikTiOuiqh9hXH"

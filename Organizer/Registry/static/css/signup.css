@@ -1,115 +1,132 @@
-*{
+* {
     font-size: calc(2vh);
-}
-
-html, body{
+  }
+  
+  html,
+  body {
     height: 100%;
-}
-
-.container{
-    height: 100%;
-    align-content: center;
-}
-
-.card{
-    height: auto;
-    width: calc(25vw);
-    margin-top: auto;
-    margin-bottom: auto;
-    background-color: rgba(0,0,0,0.8) !important;
-}
-
-.card-header h3{
+    --card-width: 30vw;
+    --card-height: 65vh;
+    --card-header-height: calc(var(--card-height) / 8.5);
+    --card-footer-height: var(--card-header-height);
+  }
+  
+  #card {
+    height: var(--card-height);
+    width: var(--card-width);
+    position: absolute;
+    left: calc(50vw - var(--card-width) / 2);
+    top: calc(50vh - var(--card-height) / 2);
+    background-color: rgba(0, 0, 0, 0.8) !important;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  #card-header {
     color: white;
-}
-
-.input-group-prepend{
-    background-color: #FFC312;
-}
-
-.input-group-prepend span{
-    width: calc(2vw);
-    background-color: #FFC312;
+    font-size: calc(var(--card-header-height)/1.2);
+    text-align: center;
+    margin: 15px auto;
+    height: calc(var(--card-header-height)/1.2 + 5px);
+  }
+  
+  #card-body {
+    height: calc(
+      var(--card-height) - var(--card-footer-height) - var(--card-header-height)
+    );
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  
+  form {
+    width: 100%;
+  }
+  
+  .input-group {
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    margin: 10px auto;
+  }
+  
+  .input-group-text {
+    width: calc(var(--card-width) / 10);
+    background-color: #ffc312;
     color: black;
-    border:0 !important;
-}
-
-input:focus{
-    outline: 0 0 0 0  !important;
-    box-shadow: 0 0 0 0 !important;
-}
-
-.login_btn{
+    border: 0 !important;
+    border-radius: 5px 0% 0% 5px;
+    text-align: center;
+  }
+  
+  .input-group-text > i {
+    width: min-content;
     color: black;
-    background-color: #FFC312;
-    width: 100px;
-}
+    background-color: #ffc312;
+    margin-top: 10px;
+  }
+  
+  .form-fields {
+    height: 2rem;
+    border: 1px solid gray;
+    background-color: rgb(238, 228, 228);
+    border-radius: 0 5px 5px 0;
+    width: 90%;
+    padding-left: 15px;
+  }
 
-.login_btn:hover{
-    color: black;
-    background-color: white;
-}
+  #info, .labels{
+      color: white;
+      text-align: center;
+  }
 
-.radio{
-    height: 25px;
-    margin-top: calc(0.8vh);
-}
+  fieldset{
+      border: none;
+  }
 
-.labels{
-    font-size: 1.3rem;
-    width: auto;
-    height: min-content;
-    color: white;
-}
-
-.links{
-    color: white;
-}
-
-.links a{
+  #batches{
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      transform: scale(1.5);
+  }
+  
+  #login-btn {
+    float: center;
+    background-color: #ffc312;
+    border: 1px solid gray;
+    padding: 5px 10px;
+    border-radius: 4px;
+    margin-left: calc(var(--card-width) / 20);
+  }
+  
+  #card-footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    margin: 10px auto;
+    height: var(--card-footer-height);
+  }
+  
+  #card-footer > div > a {
+    color: orange;
     margin-left: 4px;
-}
-
-.footerInfo{
+  }
+  
+  .links {
     color: white;
-    font-size: 1.1rem;
-}
-
-@media (max-width:768px){
-    .card{
-        width: calc(80vw);
+  }
+  
+  @media (max-width: 768px) {
+    body {
+      --card-width: 90vw;
+      --card-height: 70vh;
     }
-
-    .input-group-prepend{
-        width: 40px;
-        border-radius: 40% 0% 0% 40%;
+  
+    #card-footer > div > a,
+    #card-footer > div {
+      font-size: 1.3rem;
     }
-    .input-group-prepend span{
-        width: calc(2vw);
-    }
-
-    .radio{
-        height: 20px;
-        margin-top: calc(0.5vh);
-    }
-}
-
-@media (min-width: 769px) and (max-width: 1024px){
-    
-    .card{
-        width: calc(60vw);
-    }
-
-    .radio{
-        height: 20px;
-        margin-top: calc(0.5vh);
-    }
-
-    .input-group-prepend{
-        width: 40px;
-        border-radius: 40% 0% 0% 40%;
-    }
-    .input-group-prepend span{
-        width: calc(2vw);
-    }
-}
+  }
+  

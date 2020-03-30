@@ -2,64 +2,48 @@
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Login</title>
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"
+        integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">
 
-    <link rel="stylesheet" href = '{% static "css/login.css" %}'>
+    <link rel="stylesheet" href='{% static "css/login.css" %}'>
 </head>
-<body>
-    <script
-  src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-  integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8="
-  crossorigin="anonymous"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
-    <div class = "container">
-        <div class = "d-flex justify-content-center h-100">
-            <div class = "card">
-                <div class = "card-header">
-                    <h3>Sign In</h3>
+<body>
+    <div id="card">
+        <div id="card-header">
+            Sign In
+        </div>
+        <div id="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    {{ form.phone_number }}
                 </div>
-                <div class = "card-body">
-                    <form method="POST">
-                        {% csrf_token %}
-                        <div class = "input-group form-group">
-                                <div class = "input-group-prepend">
-                                    <span class = "input-group-text"><i class="fas fa-user" style = "color:black;"></i></span>
-                                </div>
-                                {{ form.phone_number }}
-                            </div>
-                            <div class = "input-group form-group">
-                                <div class = "input-group-prepend">
-                                    <span class = "input-group-text"><i class="fas fa-key" style = "color:black;"></i></span>
-                                </div>
-                                {{ form.password }}
-                            </div>
-                        <div class="form-group">
-                            <input type="submit" value="Login" class="btn float-right login_btn">
-                        </div>
-                    </form>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-key"></i></span>
+                    {{ form.password }}
                 </div>
-                <div class = "card-footer">
-                    <div class = "d-flex justify-content-center links">
-                        Don't have an account? <a href = "{% url 'signup' %}" style="color: orange">Sign Up</a>
-                    </div>
-                    <div class = "d-flex justify-content-center links">
-                        Forgot Password? <a href = "{% url 'recoverPassword' %}" style="color: orange">Click here</a>
-                    </div>
-                </div>
+                <input type="submit" value="Login" id="login-btn">
+            </form>
+        </div>
+        <div id="card-footer">
+            <div class="links">
+                Don't have an account? <a href="{% url 'signup' %}">Sign Up</a>
+            </div>
+            <div class="links">
+                Forgot Password? <a href="{% url 'recoverPassword' %}">Click here</a>
             </div>
         </div>
     </div>
 
 </body>
+
 </html>

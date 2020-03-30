@@ -3,8 +3,8 @@ th, td{
     vertical-align: middle !important;
 }
 
-#attendanceAll{
-    width: 90%;
+#feesAll{
+    width: 60%;
     height: 100%;
     margin: auto;
     padding-top: calc(5vh);
@@ -24,7 +24,10 @@ th, td{
 }
 
 #ease{
-    visibility: visible;
+    visibility: hidden;
+    text-align: center;
+    color: black;
+    padding: 1rem;
 }
 #niceness{
     font-size: 1.5rem;
@@ -35,21 +38,38 @@ th, td{
     font-size: 2rem;
 }
 
-#formTable{
-    position: relative;
-    margin: auto;
+tbody > tr:nth-child(even){
+    background-color: lightgray;
 }
 
-#submit{
-    position: relative;
+tbody > tr:hover{
+    background-color: lightgray;
 }
 
-@media (min-width: 768px){
-    #attendanceAll{
-        width: 60%;
+table, th, td, tr{
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+th, td, tr{
+    padding:2px;
+}
+
+@media (max-width: 768px){
+    #search-bar{
+        width: 75%;
     }
 
     #ease{
-        visibility: hidden;
+        display: unset;
+        float: right;
+    }
+
+    #feesAll{
+        width: 90%;
+    }
+
+    br{
+        display: unset;
     }
 }

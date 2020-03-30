@@ -52,6 +52,8 @@ def login_view(request):
                 return redirect('/admin-home/')
 
             elif response == "No":
+                user = UserData.objects.get(phone_number = phone_number)
+                request.session['user_info'] = user.id
                 return redirect('/student-home/')
 
             else:
@@ -107,7 +109,7 @@ def register_view(request):
 def login_admin_home_view(request):
     if checkStatus(request, sudo=True) == "superuser":
         appearance = False
-        deleteOldFiles()
+        # deleteOldFiles()
 
         if UserData.objects.filter(validated=0):
             appearance = True
@@ -126,7 +128,7 @@ def login_student_home_view(request):
     if checkStatus(request):
         user_id = request.session.get('user_info')
         user = UserData.objects.get(id=user_id)
-
+        print(user)
         args = {}
         args['id'] = user.id
         args['name'] = user.username
@@ -169,6 +171,7 @@ def attendance_view(request):
                             present.append(user.id)
 
                     markPresent(present)
+                    messages.info(request, "Attendance has been marked")
                     return redirect('studentsData')
 
             if 'search' in request.POST:
@@ -200,6 +203,7 @@ def fees_view(request):
                             User.last_fees_paid = getTime()
                             User.save()
 
+                    messages.info(request, "Fees details updated")
                     return redirect('fees')
 
             if 'search' in request.POST:
@@ -229,15 +233,12 @@ def validate_student_view(request):
                         student.save()
                     elif (response == "Delete"):
                         student.delete()
+
+                messages.info(request, "Selected students have been validated/deleted accordingly.")
                 return redirect('adminhome')
         else:
             form = ValidationForm()
-            users = list(map(lambda user: {
-                'name': user['username'],
-                'batch': user['batch_number'],
-                "id": user['id']
-                }, list(UserData.objects.filter(validated=False)
-            )))
+            users = findStudent(view='validate')
             
         return render(request, 'Registry/validate.html', {'users': users})
     else:
@@ -332,7 +333,7 @@ def admin_send_message_view(request):
 # View for the admin to see the list of uploaded files and download them
 def admin_view_file_view(request):
     if checkStatus(request, sudo=True) == "superuser":
-        args = {'Files': []}
+        args = {}
         userId = request.session.get('user_info')
         user = UserData.objects.get(id=userId)
         if request.method == 'POST':
@@ -343,13 +344,12 @@ def admin_view_file_view(request):
                 return download(name)
 
         else:
-            args["Files"].append(list(map(lambda File: {
+            args["Files"] = list(map(lambda File: {
                 "name": File.fileName, 
                 "date": str(File.upload_time.date()),
                 'description': File.description
                 }, \
-                UploadedFile.objects.all())))
-
+                UploadedFile.objects.all()))
             return render(request, 'Registry/adminViewFile.html', args)
 
     else:
@@ -519,7 +519,7 @@ def recover_password_view(request):
             user = UserData.objects.get(phone_number=phone_number)
             sendMail(user)
             messages.info(request, 'Details sent to your accout mail')
-            return redirect('home')
+            return redirect('login')
         except:
             messages.info(request, 'This phone number is not present. Check out with other phone numbers that you may have used')
 
@@ -532,7 +532,7 @@ def recover_password_view(request):
 def delete_user_view(request):
     if request.method == 'POST':
         if 'delete' in request.POST:
-            form = delete_form(request.POST)
+            form = DeleteStudentForm(request.POST)
             selected_user_ids = list(filter(lambda x: int(x) if str.isdigit(x) else None, request.POST.keys()))
             
             for id in selected_user_ids:
@@ -544,14 +544,13 @@ def delete_user_view(request):
             return HttpResponseRedirect('/admin-home/')
 
         if 'search' in request.POST:
-            
 
-            form = delete_form()
+            form = DeleteStudentForm()
             args = {'form': form, 'students': findStudent(request.POST.get("search_field"), view='delete')}
             return render(request, 'Registry/deleteUser.html', args)
 
         if 'change' in request.POST:
-            form = delete_form(request.POST)
+            form = DeleteStudentForm(request.POST)
             selected_user_ids = list(filter(lambda x: int(x) if str.isdigit(x) else None, request.POST.keys()))
             
             for id in selected_user_ids:
@@ -562,7 +561,7 @@ def delete_user_view(request):
             messages.info(request, 'Batch number of selected users has been changed.')
             return HttpResponseRedirect('/admin-home/')
     else:
-        form = delete_form()
+        form = DeleteStudentForm()
         args = {'form': form, 'students': findStudent(view='delete')}
 
         return render(request, 'Registry/deleteUser.html', args)

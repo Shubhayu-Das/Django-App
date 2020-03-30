@@ -11,7 +11,7 @@
     text-decoration: none;
 }
 
-#receivedMessages{
+table{
     max-width: 60%;
     margin: auto;
 }
@@ -55,8 +55,38 @@ th, td{
     font-size: calc(3vh);
 }
 
+#no-message{
+    width: fit-content;
+    margin: auto;
+}
+
+.hidden{
+    display: none;
+}
+
+a{
+    text-decoration: none;
+}
+
+tbody > tr:nth-child(even){
+    background-color: lightgray;
+}
+
+tbody > tr:hover{
+    background-color: lightgray;
+}
+
+table, th, td, tr{
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+th, td, tr{
+    padding:2px;
+}
+
 @media (max-width: 768px){
-    #receivedMessages, #sentMessages, #sender, #tags{
+    table, #sentMessages, #sender, #tags{
         max-width: 80%;
     }
 }

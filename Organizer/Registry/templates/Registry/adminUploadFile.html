@@ -2,52 +2,48 @@
 {% load static %}
 
 {% block style %}
-<link rel="stylesheet" href={% static "css/adminUploadFile.css" %}>
+<link rel="stylesheet" href='{% static "css/adminUploadFile.css" %}'>
 {% endblock %}
 
 {% block body %}
 <div id="upload">
     <form method="POST" enctype="multipart/form-data" class="md-form">
         {% csrf_token %}
-        <a id="ease" href="#upload-btn" class="float-right" style="text-align: center; color: black; padding: 0.5rem;">
+        <a id="ease" href="#submit-btn">
             Send <br> <i class="fas fa-arrow-down"></i></a>
         <label id="file-message"> File description: </label>
         {{ form.file_description }}
         {{ form.upload_file }}
         <br><br>
-        
-        <input class="form-control mr-sm-2 mb-md-2" type="search" placeholder="Search" aria-label="Search"
-            name="search_field">
-        <input type="submit" name="search" value="search" class="btn btn-outline-success my-2 my-sm-0 float-right"
-            id="submit">
-        <div id="selectTable">
-            <table class="table table-striped table-bordered">
-                <thead>
-                    <tr>
-                        <th class="general"> Select all </th>
-                        <th><input type="checkbox" class="check" name="selectall"></th>
-                    </tr>
-                    <tr>
-                        <th class="general"> Batch 1</th>
-                        <th><input type="checkbox" class="check" name="batch1"></th>
-                    </tr>
-                    <tr>
-                        <th class="general"> Batch 2 </th>
-                        <th><input type="checkbox" class="check" name="batch2"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for student in students %}
-                    <tr>
-                        <td class="labels">{{ student.username }}</td>
-                        <td><input type="checkbox" class="check" name="{{student.id}}"></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <input type="submit" name="upload" id="upload-btn" value="upload" class="btn login-btn btn-primary float-right"
-            id="file-submit" />
+
+        <input id="search-bar" type="search" placeholder="Search by name" aria-label="Search" name="search_field">
+        <input type="submit" name="search" value="search" id="search-submit">
+
+        <table>
+            <thead>
+                <tr>
+                    <th class="general"> Select all </th>
+                    <th><input type="checkbox" name="selectall"></th>
+                </tr>
+                <tr>
+                    <th class="general"> Batch 1</th>
+                    <th><input type="checkbox" name="batch1"></th>
+                </tr>
+                <tr>
+                    <th class="general"> Batch 2 </th>
+                    <th><input type="checkbox" name="batch2"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td class="labels">{{ student.username }}</td>
+                    <td><input type="checkbox" name="{{student.id}}"></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" name="upload" id="submit-btn" value="upload"/>
     </form>
 </div>
 {% endblock %}

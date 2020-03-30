@@ -16,7 +16,7 @@
             <a href="#batch2">Batch 2</a>
         </li>
     </ul>
-    <table class = "table table-striped table-bordered table-hover table-responsive">  
+    <table id="data-table">  
         <thead>
             <tr>
                 <th class = 'name'>Name</th>
@@ -33,7 +33,7 @@
             <tr>
                     <td class = 'name'>{{ user.username }}</td>
                     <td>{{ user.phone_number }}</td>
-                    <td>{{ user.no_of_class_attended }}</td>
+                    <td style="text-align: center;">{{ user.no_of_class_attended }}</td>
                     <td>{{ user.last_class_attended }}</td>
             </tr>
             {% endfor %}
@@ -46,7 +46,7 @@
             <tr>
                     <td class = 'name'>{{ user.username }}</td>
                     <td>{{ user.phone_number }}</td>
-                    <td>{{ user.no_of_class_attended }}</td>
+                    <td style="text-align: center;">{{ user.no_of_class_attended }}</td>
                     <td>{{ user.last_class_attended }}</td>
             </tr>
             {% endfor %}

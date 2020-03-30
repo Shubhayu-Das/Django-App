@@ -19,6 +19,9 @@ def findStudent(name = '', view=''):
     if view == 'findall':
         return list(map(lambda x: {'username': x.username, 'id': x.id}, UserData.objects.filter(is_superuser = False, validated = True, username__icontains=name)))
 
+    elif view == 'validate':
+        return list(map(lambda x: {'name': x.username, 'id': x.id, 'batch': x.batch_number}, UserData.objects.filter(is_superuser = False, validated = False, username__icontains=name)))
+
     elif view == 'fees':
         params = ['id', 'username', 'no_of_class_attended', 'last_fees_paid']
         
@@ -35,6 +38,7 @@ def findStudent(name = '', view=''):
     batch2 = list(map(lambda x: {param:x[param] for param in params}, UserData.objects.filter(username__icontains=name, is_superuser = False, validated = True, batch_number=2).values()))
 
     return {'batch1':batch1, 'batch2': batch2}
+
 
 def sendMail(user):
     subject = str(user.username) + " account details."
@@ -68,6 +72,7 @@ def errorMessage(request, errorCode=None):
     elif errorCode == 'wrongPassword':
         messages.info(request, 'Please enter the correct password')
 
+
 def checkStatus(request, sudo=False):
     userId = request.session.get('user_info')
     try:
@@ -88,6 +93,7 @@ def checkStatus(request, sudo=False):
 
 def getTime():
     return datetime.now(tz=pytz.timezone('Asia/Kolkata')) + timedelta(hours=5, minutes=30)
+
 
 def authenticate(request, phone_number=None, password=None):
     try:
@@ -118,6 +124,7 @@ def authenticate(request, phone_number=None, password=None):
         messages.info(request, "Please wait until the admin validates your account")
         return "None"
 
+
 def sendMessage(sender_id, message, recipients):
     for user in recipients:
         user.unseen_message_count += 1
@@ -127,6 +134,7 @@ def sendMessage(sender_id, message, recipients):
 
     message = Message(message=message, sender=sender, datePosted=getTime())
     message.save()
+    print(recipients)
     for recipient in recipients:
         message.allowedUsers.add(recipient)
 
@@ -140,7 +148,6 @@ def markPresent(present):
         person.save()
 
 
-
 # Dropbox file media related function
 def dropboxLogin():
     if settings.DEBUG:
@@ -150,6 +157,7 @@ def dropboxLogin():
         import os
         dbx = os.environ.get('DROPBOX_API_KEY', None)
     return dbx
+
 
 # Used in admin_upload_file_view
 def upload(description, recipients, upload_file):
@@ -171,6 +179,7 @@ def upload(description, recipients, upload_file):
     for recipient in recipients:
         newFile.allowedUsers.add(recipient)
 
+
 # Used by student_download_view and admin_view_file_view
 def download(name):
     dbx = dropboxLogin()
@@ -180,7 +189,6 @@ def download(name):
         print('*** HTTP error', err)
         return None
 
-    print(res)
     data = res.content
 
     response = HttpResponse(data)
@@ -189,14 +197,18 @@ def download(name):
 
     raise Http404
 
+
 # Function to delete old files once storage space starts running out
 #TODO: Implement auto-delete
 def deleteOldFiles():
     dbx = dropboxLogin()
-    spaceUsage = str(dbx.users_get_space_usage()).split('=')
-    usedSpace = int(spaceUsage[1].split(',')[0])
-    totalSpace = int(spaceUsage[-1].split(')')[0])
-    percentageUsed = usedSpace/totalSpace
+    if dbx:
+        spaceUsage = str(dbx.users_get_space_usage()).split('=')
+        usedSpace = int(spaceUsage[1].split(',')[0])
+        totalSpace = int(spaceUsage[-1].split(')')[0])
+        percentageUsed = usedSpace/totalSpace
 
-    if percentageUsed > 0.9:
-        pass
+        if percentageUsed > 0.9:
+            pass
+    else:
+        return None

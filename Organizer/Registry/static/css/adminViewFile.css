@@ -32,12 +32,38 @@ th, td{
     text-align: center
 }
 
-#download{
-    margin-top: calc(3vh);
+fieldset{
+    visibility: hidden;
 }
 
 .fa-arrow-right{
     font-size: 28px;
+}
+
+tbody > tr:nth-child(even){
+    background-color: lightgray;
+}
+
+tbody > tr:hover{
+    background-color: lightgray;
+}
+
+table, th, td, tr{
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+th, td, tr{
+    padding:2px;
+}
+
+#no-message{
+    width: fit-content;
+    margin: auto;
+}
+
+#submit-btn{
+    left: 0;
 }
 
 @media (max-width: 768px){

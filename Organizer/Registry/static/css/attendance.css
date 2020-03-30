@@ -3,7 +3,7 @@ th, td{
 }
 
 #attendanceAll{
-    width: 90%;
+    width: 60%;
     height: 100%;
     margin: auto;
     padding-top: calc(5vh);
@@ -31,28 +31,55 @@ th, td{
     font-size: calc(2.5vh);
 }
 
-#formTable{
-    position: relative;
+table{
     margin: auto;
 }
 
-#submit{
-    position: relative;
-}
-
 #ease{
-    visibility: visible;
+    display: none;
+    text-align: center;
+    color: black;
+    padding: 1rem;
 }
 
-@media (min-width: 768px){
-    br{
-        display: none;
-    }
-    #attendanceAll{
-        width: 60%;
+br{
+    display: none;
+}
+
+
+tbody > tr:nth-child(even){
+    background-color: lightgray;
+}
+
+tbody > tr:hover{
+    background-color: lightgray;
+}
+
+table, th, td, tr{
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+th, td, tr{
+    padding:2px;
+}
+
+
+@media (max-width: 768px){
+    #search-bar{
+        width: 75%;
     }
 
     #ease{
-        visibility: hidden;
+        display: unset;
+        float: right;
+    }
+
+    #attendanceAll{
+        width: 90%;
+    }
+
+    br{
+        display: unset;
     }
 }

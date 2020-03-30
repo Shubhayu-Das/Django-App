@@ -33,17 +33,53 @@ th, td{
 }
 
 #ease{
-    visibility: hidden;
+    display: none;
+    text-align: center;
+    color: black;
+    padding: 1rem;
 }
 
-#upload-btn{
-    margin-top: calc(3vh);
-}
-
-.table{
+table{
     width: calc(50vh);
     margin: auto;
     margin-top: calc(5vh);
+}
+
+tbody > tr:nth-child(even), thead > tr:nth-child(even){
+    background-color: lightgray;
+}
+
+tbody > tr:hover{
+    background-color: lightgray;
+}
+
+table, th, td, tr{
+    border-collapse: collapse;
+    border: 1px solid black;
+}
+
+th, td, tr{
+    padding:2px;
+}
+
+#file-chooser{
+    width: 50%;
+    padding: 5px;
+    border: 1px solid gray;
+    border-radius: 5px;
+}
+
+#file-desc{
+    width: 90%;
+    height: 2rem;
+    padding: 2px;
+    border: 1px solid gray;
+    color: lightgray;
+    border-radius: 5px;
+}
+
+#submit-btn{
+    left: 0;
 }
 
 @media (max-width: 768px){
@@ -51,11 +87,28 @@ th, td{
         width: 80%;
     }
 
-    .table{
+    table{
         width: 100%;
+    }
+    
+    #search-bar{
+        width: 75%;
     }
 
     #ease{
-        visibility: visible;
+        display: unset;
+        float: right;
+    }
+    
+    br{
+        display: unset;
+    }
+
+    #file-message{
+        font-size: 1.5rem;
+    }
+
+    #file-chooser{
+        width: 80%;
     }
 }
